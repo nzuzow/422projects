@@ -35,6 +35,8 @@ int main(int argc, char *argv[])
     char                 type_name[type_name_len];
     char                 my_mark;
 
+    hostent              *hp; //address of remote host
+
     // parse the argvs, obtain server_name and tcp_server_port
     parse_argv(argc, argv, &server_name_str, tcp_server_port);
 
@@ -42,8 +44,34 @@ int main(int argc, char *argv[])
     cout << "[TCP] Connecting to server: " << server_name_str
          << ":" << tcp_server_port << endl;
 
+    //added by me
+    //create the socket
+    tcp_connection_fd = socket(AF_INET, SOCK_STREAM, 0);
+
+    //designate the addressing family
+    server_addr.sin_family = AF_INET;
+
+    //get the address of the remote host and store
+    hp = gethostbyname(tcp_server_port);
+    memcpy(&server_addr.sin_addr, hp->h_addr, hp->h_length);
+
+    //get the port used on the remote side and store
+    server_addr.sin_port = htons(tcp_server_port);
+
+    //connect to other side
+    if(connect(tcp_connection_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
+    {
+      cout << "Connection error!\n";
+      close(tcp_connection_fd);
+      exit(1);
+    }
+    else
+    {
+      cout << "Connection successful!" << endl;
+    }
+
+
     Tic_Tac_Toe game;
     // my_mark is empty, the client program needs to get it from the server.
     while(get_command(outgoing_pkt, game, my_mark) == false){}
 }
-
