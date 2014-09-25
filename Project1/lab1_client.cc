@@ -35,11 +35,8 @@ int main(int argc, char *argv[])
     char                 type_name[type_name_len];
     char                 my_mark;
 
-    //char                 incoming_name[type_name_len];
-
     hostent              *hp; //address of remote host
 
-    //int                  mesglen; //actual size of message
 
     // parse the argvs, obtain server_name and tcp_server_port
     parse_argv(argc, argv, &server_name_str, tcp_server_port);
@@ -74,30 +71,49 @@ int main(int argc, char *argv[])
     {
       //let the user know the connection was successful and then send a join request to the server
       cout << "[TCP] Connection successful!" << endl;
-
-      //clear the buffer of the outgoing packet before sending.
-      memset(&outgoing_pkt, 0, sizeof(outgoing_pkt));
-
-      //set the type of the outgoing packet
-      outgoing_pkt.type = JOIN;
-
-      //send the JOIN request to the server
-      bytes_sent = send(tcp_connection_fd, &outgoing_pkt, sizeof(outgoing_pkt), 0);
-
-      // check for errors in sending the information
-      if(bytes_sent < 0)
-      {
-        cerr << "[ERR] Error sending message to server." << endl;
-        exit(1);
-      }
-      else
-      {
-          get_type_name(outgoing_pkt.type, type_name);
-          cout << "[TCP] Sent: " << type_name << " " << outgoing_pkt.buffer << endl;
-      }
-
     }
 
+    //clear the buffer of the outgoing packet before sending.
+    memset(&outgoing_pkt, 0, sizeof(outgoing_pkt));
+
+    //set the type of the outgoing packet
+    outgoing_pkt.type = JOIN;
+
+    //send the JOIN request to the server
+    bytes_sent = send(tcp_connection_fd, &outgoing_pkt, sizeof(outgoing_pkt), 0);
+
+    // check for errors in sending the information
+    if(bytes_sent < 0)
+    {
+      cerr << "[ERR] Error sending message to server." << endl;
+      exit(1);
+    }
+    else
+    {
+        get_type_name(outgoing_pkt.type, type_name);
+        cout << "[TCP] Sent: " << type_name << " " << outgoing_pkt.buffer << endl;
+    }
+
+    // wipe out anything in incoming_pkt's buffer
+    memset(&incoming_pkt, 0, sizeof(incoming_pkt));
+
+    // receive
+    bytes_received = recv(tcp_connection_fd, &incoming_pkt, sizeof(incoming_pkt), 0);
+
+    //check for errors in receiving the bytes
+    if(bytes_received < 0)
+    {
+      cerr << "[ERR] Error receiving message from server." << endl;
+      exit(1);
+    }
+    else
+    {
+      get_type_name(incoming_pkt.type, type_name);
+      cout << "[TCP] Received: " << type_name << " " << incoming_pkt.buffer << endl;
+    }
+
+    //set the mark for the client to the mark assigned by the server
+    my_mark = incoming_pkt.buffer[0];
 
     Tic_Tac_Toe game;
     // my_mark is empty, the client program needs to get it from the server.
