@@ -1,0 +1,42 @@
+Student NetID: alice999, I am working with bob99999.
+Compilation tested on: ned, skinner, marge ...
+Command for compile: make
+
+Logs:
+
+Player 1:
+ >./lab1_client -s localhost -p 59748
+[TCP] Tic Tac Toe client started...
+[TCP] Connecting to server: localhost:59748
+[TCP] Sent: JOIN
+[TCP] Rcvd: JOIN_GRANT O
+[TCP] Sent: GET_UDP_PORT
+[TCP] Rcvd: UDP_PORT 37854
+[UDP] Sent: GET_BOARD O
+[SYS] Waiting for response ...
+[UDP] Rcvd: YOUR_TURN _________
+|---|---|---|
+| a | b | c |
+|---+---+---|
+| d | e | f |
+|---+---+---|
+| g | h | i |
+|---|---|---|
+[SYS] Your turn.
+[CMD] EXIT
+[UDP] Sent: EXIT
+[UDP] Rcvd: EXIT_GRANT
+You have left the game. You lose!
+
+Player 2:
+>./lab1_client -s localhost -p 59748
+[TCP] Tic Tac Toe client started...
+[TCP] Connecting to server: localhost:59748
+[TCP] Sent: JOIN
+[TCP] Rcvd: JOIN_GRANT X
+[TCP] Sent: GET_UDP_PORT
+[TCP] Rcvd: UDP_PORT 37854
+[UDP] Sent: GET_BOARD X
+[SYS] Waiting for response ...
+[UDP] Rcvd: EXIT_GRANT
+Opponent has left the game. You win!
