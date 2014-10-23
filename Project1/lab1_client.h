@@ -99,6 +99,7 @@ bool get_command(My_Packet &outgoing_pkt, Tic_Tac_Toe &game, char my_mark)
     //       the player.
     char command[16];
     char param[16];
+    char buf[16] = {my_mark};
 
     cout << "[CMD] ";
     cin >> command; // first, get an input as the command
@@ -114,6 +115,7 @@ bool get_command(My_Packet &outgoing_pkt, Tic_Tac_Toe &game, char my_mark)
         // to leave this game.
         memset(outgoing_pkt.buffer, 0, buffer_len);
         outgoing_pkt.type = EXIT;
+	memcpy(outgoing_pkt.buffer, buf, 16);
         return true;
     }
     else if(strcmp(command, "MARK\0") == 0)

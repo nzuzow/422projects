@@ -1,22 +1,59 @@
-Student NetID: alice999, I am working with bob99999.
-Compilation tested on: ned, skinner, marge ...
+Student NetID: zuzownic, I am working with grotheju
+Compilation tested on: marge
 Command for compile: make
 
 Logs:
 
 Player 1:
- >./lab1_client -s localhost -p 59748
+
+lab1_client -s localhost -p 34416
 [TCP] Tic Tac Toe client started...
-[TCP] Connecting to server: localhost:59748
-[TCP] Sent: JOIN
-[TCP] Rcvd: JOIN_GRANT O
-[TCP] Sent: GET_UDP_PORT
-[TCP] Rcvd: UDP_PORT 37854
+[TCP] Connecting to server: localhost:34416
+[TCP] Sent: JOIN 
+[TCP] Recv: JOIN_GRANT O
+[TCP] Sent: GET_UDP_PORT 
+[TCP] Recv: UDP_PORT 37527
 [UDP] Sent: GET_BOARD O
-[SYS] Waiting for response ...
-[UDP] Rcvd: YOUR_TURN _________
+[SYS] Waiting for response...
 |---|---|---|
 | a | b | c |
+|---+---+---|
+| d | e | f |
+|---+---+---|
+| g | h | i |
+|---|---|---|
+[SYS] Your turn.
+[CMD] MARK b
+|---|---|---|
+| a | O | c |
+|---+---+---|
+| d | e | f |
+|---+---+---|
+| g | h | i |
+|---|---|---|
+[UDP] Sent: PLAYER_MARK b
+[UDP] Rcvd: UPDATE_BOARD _O_______
+[UDP] Sent: GET_BOARD O
+[SYS] Waiting for response...
+[UDP] Rcvd: EXIT_GRANT
+Opponent has left the game. You win!
+
+Player 2:
+
+lab1_client -s localhost -p 34416
+[TCP] Tic Tac Toe client started...
+[TCP] Connecting to server: localhost:34416
+[TCP] Sent: JOIN 
+[TCP] Recv: JOIN_GRANT X
+[TCP] Sent: GET_UDP_PORT 
+[TCP] Recv: UDP_PORT 37527
+[UDP] Sent: GET_BOARD X
+[SYS] Waiting for response...
+[UDP] Rcvd: UPDATE_BOARD _O_______
+[UDP] Sent: GET_BOARD X
+[SYS] Waiting for response...
+|---|---|---|
+| a | O | c |
 |---+---+---|
 | d | e | f |
 |---+---+---|
@@ -28,15 +65,3 @@ Player 1:
 [UDP] Rcvd: EXIT_GRANT
 You have left the game. You lose!
 
-Player 2:
->./lab1_client -s localhost -p 59748
-[TCP] Tic Tac Toe client started...
-[TCP] Connecting to server: localhost:59748
-[TCP] Sent: JOIN
-[TCP] Rcvd: JOIN_GRANT X
-[TCP] Sent: GET_UDP_PORT
-[TCP] Rcvd: UDP_PORT 37854
-[UDP] Sent: GET_BOARD X
-[SYS] Waiting for response ...
-[UDP] Rcvd: EXIT_GRANT
-Opponent has left the game. You win!

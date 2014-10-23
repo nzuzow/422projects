@@ -401,6 +401,7 @@ void game_handler(int* tcp_player_fd)
                  << endl;
             memset(&outgoing_pkt, 0, sizeof(outgoing_pkt));
             outgoing_pkt.type = EXIT_GRANT;
+            outgoing_pkt.buffer[0] = incoming_pkt.buffer[0];
             bytes_sent = sendto(udp_server_fd, &outgoing_pkt, 
                                 sizeof(outgoing_pkt), 0, 
                                 (sockaddr *) &udp_connection_addr,
@@ -412,8 +413,7 @@ void game_handler(int* tcp_player_fd)
             }
             // convert the type in int to char type_name
             get_type_name(outgoing_pkt.type, type_name);
-            cout << "[UDP:" << udp_server_port << "] Sent: " << type_name << " "
-                 << outgoing_pkt.buffer << endl;
+            cout << "[UDP:" << udp_server_port << "] Sent: " << type_name << endl;
 
             bytes_sent = sendto(udp_server_fd, &outgoing_pkt, 
                                 sizeof(outgoing_pkt), 0, 
@@ -426,8 +426,7 @@ void game_handler(int* tcp_player_fd)
             }
             // convert the type in int to char type_name
             get_type_name(outgoing_pkt.type, type_name);
-            cout << "[UDP:" << udp_server_port << "] Sent: " << type_name << " "
-                 << outgoing_pkt.buffer << endl;
+            cout << "[UDP:" << udp_server_port << "] Sent: " << type_name << endl;
             
             break;
         }
