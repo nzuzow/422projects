@@ -26,9 +26,9 @@ void* connection_handler(void *arg){
 }
 
 /*
- * Purpose: Contains the main server loop that handles requests by 
+ * Purpose: Contains the main server loop that handles requests by
  *          spawing child threads
- * Receive: argc is the number of command line params, argv are the 
+ * Receive: argc is the number of command line params, argv are the
  *          parameters
  * Return:  0 on clean exit, and 1 on error
  */
@@ -98,4 +98,3 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
-
