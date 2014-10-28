@@ -175,7 +175,7 @@ void Proxy_Worker::handle_request() {
         bool forward_request = forward_request_get_response();
 
         // Return the response to the client
-        bool send_response = return_response();
+        //bool send_response = return_response();
 
         cout << "Connection served. Proxy child thread terminating." << endl;
     }
@@ -257,7 +257,7 @@ bool Proxy_Worker::check_request()
 
     // Pass the client address to URL::Parse to check the validity of the server
     server_url = URL::parse(requested_url);
-
+	cout << "requested url: " << requested_url << endl;
     // Check the validity of the URL object
     if( server_url == NULL)
     {
@@ -266,7 +266,18 @@ bool Proxy_Worker::check_request()
     }
 
     // Create a connection to the server url on the server socket
-    server_sock.Connect(*server_url);
+    //server_sock.Connect(*server_url);
+
+    try
+    {
+        // Create a connection to the server url on the server socket
+    	server_sock.Connect(*server_url);
+    }
+    catch(string msg)
+    {
+        cerr << msg << endl;
+        exit(1);
+    }
 
     return 1;
 }
@@ -407,11 +418,11 @@ bool Proxy_Worker::forward_request_get_response() {
 
         cout << "Default encoding transfer" << endl;
         cout << "Content-length: " << server_response->get_content_len() << endl;
-        bytes_left = server_response->get_content_len();
+        //bytes_left = server_response->get_content_len();
 
 
-        do
-        {
+        //do
+        //{
             // If we got a piece of the file in our buffer for the headers,
             // have that piece written out to the file, so we don't lose it.
 
@@ -430,22 +441,22 @@ bool Proxy_Worker::forward_request_get_response() {
                 exit(1);
             }*/
 
-            bytes_written += response_body.length();
+          /*  bytes_written += response_body.length();
             bytes_left -= response_body.length();
 
-            cout << "bytes written:" <<  bytes_written << endl;
-            cout << "data gotten:" <<  response_body.length() << endl;
+          //  cout << "bytes written:" <<  bytes_written << endl;
+          //  cout << "data gotten:" <<  response_body.length() << endl;
 
-            response_body.clear();
-            try
-            {
+          //  response_body.clear();
+            //try
+            //{
                 // Keeps receiving until it gets the amount it expects.
                 //server_response->receive_data(*client_sock, response_body,
                 //                       bytes_left);
-                  server_response->receive_data(server_sock, response_body,
-                                         bytes_left);
+                  //server_response->receive_data(server_sock, response_body,
+                  //                       bytes_left);
                   //std::string response_data = server_response->get_content();
-            }
+            //}
             catch(string msg)
             {
                 // something bad happend
@@ -463,13 +474,16 @@ bool Proxy_Worker::forward_request_get_response() {
                 server_sock.Close();
                 exit(1);
             }
-        } while (bytes_left > 0);
+        } while (bytes_left > 0);*/
 
 
         //server_response = HTTP_Response::create_standard_response(server_response->get_content_len(), 200, "OK", "HTTP/1.1");
 
         // Try sending directly to the client and not writing to a file.
-        //bool send_response = return_response();
+        bool send_response = return_response();
+	
+	// write the response to the client
+	int write_response = client_sock->write_string(response_body);
 
     }
     else
@@ -512,8 +526,9 @@ bool Proxy_Worker::return_response() {
         cout << print_buffer.substr(0, print_buffer.length() - 4) << endl;
         cout << "=========================================================="
              << endl;
-
-        server_response->send(*client_sock);
+	
+	server_response->send_no_error(*client_sock);
+        //server_response->send(*client_sock);
         //server_response->send(server_sock);
     }
     catch(string msg)
