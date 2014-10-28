@@ -262,6 +262,9 @@ bool Proxy_Worker::check_request()
       return 0;
     }
 
+    // Create a connection to the server url on the server socket
+    server_sock.Connect(*server_url);
+
     return 1;
 }
 
@@ -289,7 +292,8 @@ bool Proxy_Worker::forward_request_get_response() {
 
     try
     {
-        client_request->send(*client_sock);
+        //client_request->send(*client_sock);
+        client_request->send(server_sock);
     }
     catch(string msg)
     {
@@ -329,8 +333,10 @@ bool Proxy_Worker::forward_request_get_response() {
     // contains the whole header.
     // read_header separates the header and data by finding the blank line.
 
-    server_response->receive_header(*client_sock, response_header, response_body);
-    //server_response->receive_header(server_sock, response_header, response_body);
+    //server_response->receive_header(*client_sock, response_header, response_body);
+    server_response->receive_header(server_sock, response_header, response_body);
+
+
 
     // The HTTP_Response::parse construct a response object. and check if
     // the response is constructed correctly. Also it tries to determine
@@ -353,7 +359,7 @@ bool Proxy_Worker::forward_request_get_response() {
     }
 
     // Modify the response from the server to show this worked
-    server_response->set_header_field("Server", "zuzownic");
+    //server_response->set_header_field("Server", "zuzownic");
 
 
 
@@ -390,6 +396,8 @@ bool Proxy_Worker::forward_request_get_response() {
         cout << "Default encoding transfer" << endl;
         cout << "Content-length: " << server_response->get_content_len() << endl;
         bytes_left = server_response->get_content_len();
+
+
         do
         {
             // If we got a piece of the file in our buffer for the headers,
@@ -398,7 +406,8 @@ bool Proxy_Worker::forward_request_get_response() {
             //fwrite(response_body.c_str(), 1, response_body.length(), out);
 
             // Try sending directly to the client and not writing to a file.
-            try
+            //bool send_response = return_response();
+            /*try
             {
                 server_response->send(*client_sock);
                 //server_response->send(server_sock);
@@ -407,10 +416,11 @@ bool Proxy_Worker::forward_request_get_response() {
             {
                 cerr << msg << endl;
                 exit(1);
-            }
+            }*/
 
             bytes_written += response_body.length();
             bytes_left -= response_body.length();
+
             //cout << "bytes written:" <<  bytes_written << endl;
             //cout << "data gotten:" <<  response_body.length() << endl;
 
@@ -418,10 +428,10 @@ bool Proxy_Worker::forward_request_get_response() {
             try
             {
                 // Keeps receiving until it gets the amount it expects.
-                server_response->receive_data(*client_sock, response_body,
-                                       bytes_left);
-                  //server_response->receive_data(server_sock, response_body,
-                  //                       bytes_left);
+                //server_response->receive_data(*client_sock, response_body,
+                //                       bytes_left);
+                  server_response->receive_data(server_sock, response_body,
+                                         bytes_left);
             }
             catch(string msg)
             {
@@ -441,6 +451,17 @@ bool Proxy_Worker::forward_request_get_response() {
                 exit(1);
             }
         } while (bytes_left > 0);
+
+
+        //server_response = HTTP_Response::create_standard_response(server_response->get_content_len(), 200, "OK", "HTTP/1.1");
+
+        // Try sending directly to the client and not writing to a file.
+        bool send_response = return_response();
+
+    }
+    else
+    {
+      std::cout << "This is a test. It did not hit the if statement" << std::endl;
     }
 
 
@@ -462,6 +483,22 @@ bool Proxy_Worker::return_response() {
     // TODO: return the response to the client. However, we want to modify the
     //       header field "Server" to something else (anything). You can use
     //       the function HTTP_Response::set_header_field to do this.
+
+    // Modify the response from the server to show this worked
+    server_response->set_header_field("Server", "zuzownic");
+
+    try
+    {
+        server_response->send(*client_sock);
+        //server_response->send(server_sock);
+    }
+    catch(string msg)
+    {
+        cerr << msg << endl;
+        exit(1);
+    }
+
+    return true;
 }
 
 /*

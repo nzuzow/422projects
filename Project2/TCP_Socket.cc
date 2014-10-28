@@ -26,12 +26,12 @@ TCP_Socket::~TCP_Socket() {
 }
 
 /*
- * Purpose: Private method that handles creating a socket, despite what 
+ * Purpose: Private method that handles creating a socket, despite what
  *          Connect method is used
  * Receive: None
  * Return:  None
  */
-void TCP_Socket::create_socket() 
+void TCP_Socket::create_socket()
 {
     //close the socket if it's already open
     Close();
@@ -46,7 +46,7 @@ void TCP_Socket::create_socket()
 
 /*
  * Purpose: Called to initiate a Connection to a server by a client
- * Receive: server_name is the hostname of the server, and server_port is 
+ * Receive: server_name is the hostname of the server, and server_port is
  *          the port number on the server
  * Return:  None
 */
@@ -80,7 +80,7 @@ void TCP_Socket::Connect(string &server_name, int server_port) {
 
 /*
  * Purpose: Called to initiate a Connection to a server by a client
- * Receive: host is the address of the server, and server_port is the 
+ * Receive: host is the address of the server, and server_port is the
  *          port number on the server
  * Return:  None
  */
@@ -105,11 +105,11 @@ void TCP_Socket::Connect(hostent *host, int server_port) {
 }
 
 /*
- * Purpose: called to initiate a Connection to a server and port given 
+ * Purpose: called to initiate a Connection to a server and port given
  *          by the URL
- * Reveive: url is the URL object holding the server name and port, and 
+ * Reveive: url is the URL object holding the server name and port, and
  *          resource name
- * Return:  None 
+ * Return:  None
  */
 void TCP_Socket::Connect(const URL &url) {
     hostent *hp = gethostbyname(url.get_host().c_str());
@@ -173,7 +173,7 @@ void TCP_Socket::Listen() {
     if(getsockname(sock, (sockaddr *) &server_addr,
                    &server_addr_len) < 0)
     {
-        cout << "TCP_Socket Exception: Unable to obtain TCP socket information." 
+        cout << "TCP_Socket Exception: Unable to obtain TCP socket information."
              << endl;
     }
 }
@@ -182,7 +182,7 @@ void TCP_Socket::Listen() {
  * Purpose: accepts a Connection waiting on a bound port
  * Receive: data_sock is the TCP_Socket object that will hold the new i
  *          Connection to the client
- * Return:  true if the accept was succesful, false otherwise 
+ * Return:  true if the accept was succesful, false otherwise
  */
 bool TCP_Socket::Accept(TCP_Socket &data_sock) {
     int new_sock;
@@ -241,7 +241,7 @@ int TCP_Socket::Close() {
 /*
  * Purpose: Writes a string with a given length on this socket
  * Receive: data holds the string data to be written to the socket
- * Return:  The number of bytes actually written (should always be the 
+ * Return:  The number of bytes actually written (should always be the
  *          length of the string)
  */
 int TCP_Socket::write_string(string &data) {
@@ -258,7 +258,7 @@ int TCP_Socket::write_string(string &data) {
 /*
  * Purpose: Read a string of a given length
  * Receive: data will hold the string data read from the socket
- * Return:  The number of bytes actually read (not counting the NULL 
+ * Return:  The number of bytes actually read (not counting the NULL
  *          appended to the string)
  */
 int TCP_Socket::read_string(string &data) {
@@ -276,7 +276,7 @@ int TCP_Socket::read_string(string &data) {
 
 /*
  * Purpose: Read n bytes from the socket
- * Receive: vptr: the pointer to the buffer that will be used to hold 
+ * Receive: vptr: the pointer to the buffer that will be used to hold
  *          the data
  *          n: the number of bytes to be read
  * Return:  the number of bytes read
@@ -376,7 +376,7 @@ int TCP_Socket::receive_response_headers(char *buffer, int buffer_len,
     {
         // Grab however many bytes are waiting for us right now.
         int recv_len = read(sock, buffer + bytes_recv,
-                            buffer_len - bytes_recv); 
+                            buffer_len - bytes_recv);
         if(recv_len == -1)
         {
             // Something's wrong. If we cannot receive, reutrn -1
@@ -385,7 +385,7 @@ int TCP_Socket::receive_response_headers(char *buffer, int buffer_len,
 
         // Go over what we got in the buffer and look for the end of headers
         int i;
-        for(i = bytes_recv; 
+        for(i = bytes_recv;
             (i < (bytes_recv + recv_len)) &&
             (header_end_read < header_end_len);
             i++)
@@ -402,7 +402,7 @@ int TCP_Socket::receive_response_headers(char *buffer, int buffer_len,
 
         // If we found the end, mark it.    Also keep track of how much
         // we've read total, for several reasons (not filling the
-        // buffer; knowing how much we've read past the header, etc.).    
+        // buffer; knowing how much we've read past the header, etc.).
         if(header_end_read >= header_end_len)
         {
             header_end_pos = i;
@@ -411,28 +411,28 @@ int TCP_Socket::receive_response_headers(char *buffer, int buffer_len,
     }
     total_received_len = bytes_recv;
 
-    return header_end_pos; 
+    return header_end_pos;
     // Note that this header_end_pos here includes \r\n\r\n
 }
 
 
 /*
- * Purpose: read from the socket until \r\n\r\n is captured. Then store 
+ * Purpose: read from the socket until \r\n\r\n is captured. Then store
  *          the header part and data part into two different variables
  * Receive: header: the variable to hold the header
  *          data: the variable to hold the data currently received
  * Return:  none
  */
-// Receive a piece of response and extract the header portion from it. 
-// Stores the header in the string header and store the rest in the 
+// Receive a piece of response and extract the header portion from it.
+// Stores the header in the string header and store the rest in the
 // string data.
 // One can check if the header is good by checking the length of header.
 void TCP_Socket::read_header(string &header, string &data) {
     char buffer[BUFFER_SIZE];
     int l, total = 0;
 
-    int header_end_pos = receive_response_headers
-                         (buffer, BUFFER_SIZE - 1, total);
+
+    int header_end_pos = receive_response_headers(buffer, BUFFER_SIZE - 1, total);
 
     if(header_end_pos < 0)
     {
@@ -441,12 +441,13 @@ void TCP_Socket::read_header(string &header, string &data) {
 
     else
     {
-        // Store the received header and data into 
+        // Store the received header and data into
         header.append(buffer, header_end_pos);
         data.append(buffer + header_end_pos, total - header_end_pos);
         //cout << "header length: " << header.length() << endl;
         //cout << "data length:   " <<data.length() << endl;
     }
+
 }
 
 
@@ -486,10 +487,10 @@ int TCP_Socket::read_data(string &data, int bytes_left)
 }
 
 /*
- * Purpose: Reads a line of text from socket, terminated by a carriage 
+ * Purpose: Reads a line of text from socket, terminated by a carriage
  *          return and line feed
  * Receive: data holds the string data read from the socket
- * Return:  The number of bytes actually read (should always be the 
+ * Return:  The number of bytes actually read (should always be the
  *          length of the string)
 */
 int TCP_Socket::read_line(string &data) {

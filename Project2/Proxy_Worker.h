@@ -15,7 +15,7 @@
 
 
 /*
- * Purpose: Acts as a single worker to handle a request from a proxy. It 
+ * Purpose: Acts as a single worker to handle a request from a proxy. It
  *          does not cache anything in this lab. It just pass the requst
  *          to the server and return the response to the client.
 */

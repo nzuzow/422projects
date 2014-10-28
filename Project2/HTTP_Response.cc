@@ -45,7 +45,7 @@ HTTP_Response::~HTTP_Response() {
 // header is good.
 //
 // If the request succeeded, the "Content-Length" indicates the length
-// of the response body. According to that value, we know how many 
+// of the response body. According to that value, we know how many
 // bytes we need to recevie.
 //
 // If the request failed, or if the response is not correctly formatted
@@ -99,7 +99,7 @@ HTTP_Response *HTTP_Response::parse(const char* data, unsigned length)
     // Have the header lines parsed now; response line is okay.
     // Handled in HTTP_Message.cc
     bool headers_okay = response->parse_fields(first_header, length - first_line_length);
-     
+
     string tmp;
     response->get_header_value("Transfer-Encoding", tmp);
     if(tmp.find("chunked") != string::npos) {
@@ -233,7 +233,7 @@ void HTTP_Response::print(string& output_string) const
     // Take that and toss on the ending to get the first line...
     output_string = response_line.str();
     output_string += line_ending;
-    
+
     // ...and then add the associated headers.
     HTTP_Message::print(output_string);
 }
@@ -303,10 +303,10 @@ string HTTP_Response::build_time()
     struct tm *ts;
     char result[38];
     static char wday_name[7][4] = {"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
-    static char mon_name[12][4] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+    static char mon_name[12][4] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
                                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
-    // get the time 
+    // get the time
     t = time(NULL);
     ts = gmtime(&t);
 
