@@ -515,6 +515,10 @@ bool Proxy_Worker::forward_request_get_response() {
       int chunk_len = get_chunk_size(response_body);
       cout << "chunk length: " << chunk_len << endl;
       total_data = chunk_len;
+
+      // Try sending directly to the client and not writing to a file.
+      bool send_response = return_response();
+
       while(1)
       {
           // If current data holding is less than the chunk_len, this
@@ -533,6 +537,9 @@ bool Proxy_Worker::forward_request_get_response() {
                   server_response->receive_line(*client_sock, response_body);
                   // get next chunk, at least get the chunk size
                   //cout << response_body.length() << endl;
+
+                  // write the response to the client
+                  int write_response = client_sock->write_string(response_body);
               }
               catch(string msg)
               {
@@ -555,6 +562,7 @@ bool Proxy_Worker::forward_request_get_response() {
           // piece of data contains more than one chunk. Store the chunk.
           else//response_body.length() >= chunk_len
           {
+
               //fwrite(response_body.c_str(), 1, chunk_len, out);
               bytes_written += chunk_len;
 
@@ -563,6 +571,8 @@ bool Proxy_Worker::forward_request_get_response() {
 
               response_body = response_body.substr(chunk_len + 2,
                               response_body.length() - chunk_len - 2);
+
+
               //get next chunk size
               chunk_len = get_chunk_size(response_body);
               total_data += chunk_len;
@@ -572,13 +582,11 @@ bool Proxy_Worker::forward_request_get_response() {
               {
                   break;
               }
+
+
           }
       }
     }
-
-
-
-
 
 
     return true;
