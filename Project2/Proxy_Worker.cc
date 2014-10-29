@@ -153,11 +153,15 @@ void Proxy_Worker::handle_request() {
 
     // Check if this request contains the field SUBLIMINAL_POPPOP and if the
     // request is requesting an html file (using is_html() function)
-    if(sub_popped == 0) { //DONE: check the above condition
+    if(sub_popped == 0 && is_html(client_request->get_url())) { //DONE: check the above condition
         // If this request does not contain the field SUBLIMINAL_POPPED, the
         // proxy does not forward this request to the serer. Instead, the proxy
         // returns a subliminal message response to the client.
-        subliminal_response(client_request->get_url(), 1);
+
+        //if( is_html(client_request->get_url()))
+        //{
+          subliminal_response(client_request->get_url(), 1);
+        //}
     } else {
         // If this request contains the field SUBLIMNAL_POPPED, the request has
         // been served before. The proxy handles the request like a normal proxy.
@@ -205,6 +209,16 @@ bool Proxy_Worker::get_request() {
     // The clients socket is stored in client_sock
     client_request = HTTP_Request::receive(*client_sock);
 
+    //string requested_address;
+    //client_request->HTTP_Request::get_host(requested_address);
+
+    //cout << "in get request the requested address is: " << requested_address << endl;
+
+    //string requested_path;
+    //requested_path = client_request->HTTP_Request::get_path();
+
+    //cout << "in get request the requested path is: " << requested_path << endl;
+
     // Checking if the request was received correctly
     if( client_request == NULL)
     {
@@ -236,6 +250,9 @@ bool Proxy_Worker::check_request()
     client_request->HTTP_Request::get_host(requested_address);
 
     cout << "The client address is: " << requested_address << endl;
+
+    string second_request_url = client_request->HTTP_Request::get_url();
+    cout << "The url from get url is: " << second_request_url << endl;
 
     //Need to check if this is a request to facebook
     if( requested_address.find("facebook") != string::npos)
@@ -481,9 +498,9 @@ bool Proxy_Worker::forward_request_get_response() {
 
         // Try sending directly to the client and not writing to a file.
         bool send_response = return_response();
-	
-	// write the response to the client
-	int write_response = client_sock->write_string(response_body);
+
+	      // write the response to the client
+	      int write_response = client_sock->write_string(response_body);
 
     }
     else
@@ -526,8 +543,8 @@ bool Proxy_Worker::return_response() {
         cout << print_buffer.substr(0, print_buffer.length() - 4) << endl;
         cout << "=========================================================="
              << endl;
-	
-	server_response->send_no_error(*client_sock);
+
+	      server_response->send_no_error(*client_sock);
         //server_response->send(*client_sock);
         //server_response->send(server_sock);
     }
