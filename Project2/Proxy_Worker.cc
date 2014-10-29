@@ -249,10 +249,10 @@ bool Proxy_Worker::check_request()
     string requested_address;
     client_request->HTTP_Request::get_host(requested_address);
 
-    cout << "The client address is: " << requested_address << endl;
+    //cout << "The client address is: " << requested_address << endl;
 
     string second_request_url = client_request->HTTP_Request::get_url();
-    cout << "The url from get url is: " << second_request_url << endl;
+    //cout << "The url from get url is: " << second_request_url << endl;
 
     //Need to check if this is a request to facebook
     if( requested_address.find("facebook") != string::npos)
@@ -265,16 +265,16 @@ bool Proxy_Worker::check_request()
     string requested_path;
     requested_path = client_request->HTTP_Request::get_path();
 
-    cout << "The client path is: " << requested_path << endl;
+    //cout << "The client path is: " << requested_path << endl;
 
     // Put the address and the path together
     string requested_url = requested_address + requested_path;
 
-    cout << "The full path is: " << requested_url << endl;
+    //cout << "The full path is: " << requested_url << endl;
 
     // Pass the client address to URL::Parse to check the validity of the server
     server_url = URL::parse(requested_url);
-	  cout << "requested url: " << requested_url << endl;
+	  //cout << "requested url: " << requested_url << endl;
 
     // Check the validity of the URL object
     if( server_url == NULL)
@@ -426,7 +426,7 @@ bool Proxy_Worker::forward_request_get_response() {
 
     int bytes_written = 0, bytes_left;
     int total_data;
-
+    server_response->content.clear();
     if(server_response->is_chunked() == false)
     {
         // none-chunked encoding transfer does not split the data into
@@ -506,7 +506,74 @@ bool Proxy_Worker::forward_request_get_response() {
     }
     else
     {
-      std::cout << "This is a test. It did not hit the if statement" << std::endl;
+      cout << "Chunked encoding transfer" << endl;
+
+      // As mentioned above, receive_header function already split the
+      // data from the header from us. The beginning of this respnse_data
+      // now holds the first chunk size.
+      //cout << response_body.substr(0,15) << endl;
+      int chunk_len = get_chunk_size(response_body);
+      cout << "chunk length: " << chunk_len << endl;
+      total_data = chunk_len;
+      while(1)
+      {
+          // If current data holding is less than the chunk_len, this
+          // piece of data contains only part of this chunk. Receive more
+          // until we have a complete chunk to store!
+          //if(response_body.length() < (chunk_len + 4))
+          if(response_body.length() < (chunk_len + 4))
+          {
+              try
+              {
+                  // receive more until we have the whole chunk.
+                  server_response->receive_data(*client_sock, response_body,
+                              (chunk_len - response_body.length()));
+                  server_response->receive_line(*client_sock, response_body);
+                  // get the blank line between chunks
+                  server_response->receive_line(*client_sock, response_body);
+                  // get next chunk, at least get the chunk size
+                  //cout << response_body.length() << endl;
+              }
+              catch(string msg)
+              {
+                  // something bad happend
+                  cout <<  msg << endl;
+                  // clean up
+                  delete server_response;
+                  delete server_url;
+                  /*if(proxy_addr != NULL)
+                  {
+                      delete proxy_url;
+                  }*/
+                  //fclose(out);
+                  //client_sock.Close();
+                  client_sock->Close();
+                  exit(1);
+              }
+          }
+          // If current data holding is longer than the chunk size, this
+          // piece of data contains more than one chunk. Store the chunk.
+          else//response_body.length() >= chunk_len
+          {
+              //fwrite(response_body.c_str(), 1, chunk_len, out);
+              bytes_written += chunk_len;
+
+              // reorganize the data, remove the chunk from it
+              // the + 2 here is to consume the extra CLRF
+
+              response_body = response_body.substr(chunk_len + 2,
+                              response_body.length() - chunk_len - 2);
+              //get next chunk size
+              chunk_len = get_chunk_size(response_body);
+              total_data += chunk_len;
+              cout << "chunk length: " << chunk_len << endl;
+
+              if(chunk_len == 0)
+              {
+                  break;
+              }
+          }
+      }
     }
 
 
