@@ -274,7 +274,8 @@ bool Proxy_Worker::check_request()
 
     // Pass the client address to URL::Parse to check the validity of the server
     server_url = URL::parse(requested_url);
-	cout << "requested url: " << requested_url << endl;
+	  cout << "requested url: " << requested_url << endl;
+
     // Check the validity of the URL object
     if( server_url == NULL)
     {
@@ -292,8 +293,8 @@ bool Proxy_Worker::check_request()
     }
     catch(string msg)
     {
-        cerr << msg << endl;
-        exit(1);
+        bool valid_address = proxy_response(404);
+        return 0;
     }
 
     return 1;
