@@ -29,8 +29,9 @@ void Print_usage(const char* exe_name, ostream& out)
 
 int main(int argc, char* argv[])
 {
-  char* server_addr = NULL;
+  std::string server_addr;
   URI* server_uri = NULL;
+  Playlist* playlist;
 
   // Look at the command line and figure out what we're playing today.
   if (argc != 2)
@@ -45,6 +46,15 @@ int main(int argc, char* argv[])
 
   // Parse the playlist URI
   // Handle bad URI
+  // Use playlist::Parse() to get the contents from the string that is passed in
+  playlist = Playlist::Parse(server_addr);
+
+  // Now check to make sure the playlist was parsed correctly.
+  if( playlist == NULL)
+  {
+    cout << "There was an error parsing the playlist." << endl;
+    exit(1);
+  }
 
   // Download the playlist at that URI.
   // Parse it together, too.
