@@ -31,6 +31,7 @@ int main(int argc, char* argv[])
 {
   std::string server_addr;
   URI* server_uri = NULL;
+  HTTP_Request* request = NULL;
   Playlist* playlist;
 
   // Look at the command line and figure out what we're playing today.
@@ -70,6 +71,44 @@ int main(int argc, char* argv[])
 
   // Download the playlist at that URI.
   // Parse it together, too.
+
+  // TCP_Socket class to handle TCP communications.
+  TCP_Socket client_sock;
+
+  try
+  {
+    // Connect to the target server.
+    client_sock.Connect(*server_uri);
+  }
+  // Give up if sock is not created correctly.
+  catch(string msg)
+  {
+    cout << msg << endl;
+    cout << "Unable to connect to server: "
+         << server_uri->Get_host() << endl;
+    delete server_uri;
+    exit(1);
+  }
+
+  // Send a GET request for the specified file.
+  request = HTTP_Request::Create_GET_request(server_uri->Get_path());
+  request->Set_host(server_uri->Get_host());
+
+  // Print the request to a string so we can send it to the HTTP server
+  string request_str;
+  request->Print(request_str);
+
+  // Try to send the data to the server. If there is an error, then we will
+  // print the error to the screen and then exit.
+  try
+  {
+    client_sock.write_string(request_str);
+  }
+  catch(string msg)
+  {
+    cerr << msg << endl;
+    exit(1);
+  }
 
   // Get a video player set up so we can see the video.
 
