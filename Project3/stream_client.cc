@@ -46,15 +46,27 @@ int main(int argc, char* argv[])
 
   // Parse the playlist URI
   // Handle bad URI
-  // Use playlist::Parse() to get the contents from the string that is passed in
-  playlist = Playlist::Parse(server_addr);
+  // Use URI::Parse() to get the proper components from the given string
+  server_uri = URI::Parse(server_addr);
 
-  // Now check to make sure the playlist was parsed correctly.
-  if( playlist == NULL)
+  // Now check to make sure the URI was parsed correctly
+  // Not sure if we need to just check for NULL or if we need to check for just
+  // a forward slash, or an undefined port also
+  if( server_uri == NULL)
   {
-    cout << "There was an error parsing the playlist." << endl;
+    cout << "There was an error parsing the URI." << endl;
     exit(1);
   }
+
+  // Use playlist::Parse() to get the contents from the string that is passed in
+  //playlist = Playlist::Parse(server_addr);
+
+  // Now check to make sure the playlist was parsed correctly.
+  //if( playlist == NULL)
+  //{
+  //  cout << "There was an error parsing the playlist." << endl;
+  //  exit(1);
+  //}
 
   // Download the playlist at that URI.
   // Parse it together, too.
