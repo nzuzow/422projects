@@ -32,6 +32,7 @@ int main(int argc, char* argv[])
   std::string server_addr;
   URI* server_uri = NULL;
   HTTP_Request* request = NULL;
+  HTTP_Response* response = NULL;
   Playlist* playlist;
 
   // Look at the command line and figure out what we're playing today.
@@ -109,6 +110,31 @@ int main(int argc, char* argv[])
     cerr << msg << endl;
     exit(1);
   }
+
+  /* Receive response header from server */
+
+  // Setup two strings for the response header and the response body from the
+  // server.
+  string response_header, response_body;
+
+  // Now call read_header to get the proper information from the socket
+  client_sock.read_header(response_header, response_body);
+
+  // The HTTP_Response::parse construct a response object. and check if
+  // the response is constructed correctly.
+  response = HTTP_Response::Parse(response_header.c_str(), response_header.length());
+
+  // Now make sure the response is legal
+  if( response == NULL)
+  {
+    cerr << "Unable to parse the response header." << endl;
+    // clean up if there's something wrong
+    delete response;
+    delete server_uri;
+    exit(1);
+  }
+
+  /* End of receive response header from server */
 
   // Get a video player set up so we can see the video.
 
