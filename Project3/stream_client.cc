@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
     exit(1);
   }
 
-  /* Receive response header from server */
+  /* RECEIVE RESPONSE HEADER FROM SERVER */
 
   // Setup two strings for the response header and the response body from the
   // server.
@@ -134,7 +134,24 @@ int main(int argc, char* argv[])
     exit(1);
   }
 
-  /* End of receive response header from server */
+  // Even if the response is constructed correctly, we still need to check for
+  // the proper status of the server
+  string status_code;
+
+  status_code = response->Get_code();
+
+  // Make sure the status is 200. If not then we need to print an error
+  if( status_code != 200)
+  {
+    status_reason = response->Get_reason();
+
+    cout << "Request failed:" << endl;
+    cout << status_code << " " << status_reason << endl;
+    delete response;
+    exit(1);
+  }
+
+  /* END OF RECEIVE RESPONSE HEADER FROM SERVER */
 
   // Get a video player set up so we can see the video.
 
