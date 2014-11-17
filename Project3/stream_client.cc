@@ -164,7 +164,7 @@ int main(int argc, char* argv[])
   // header followed by one large body. This method takes three arguments,
   // the buffer to hold the data in, the maximum length of the buffer, and
   // the total number of bytes received so far.
-  int header_stop = client_sock.receive_response_headers(buff, buff.size(), total_received_len);
+  int header_stop = client_sock.receive_response_headers(buff, 65536, total_received_len);
 
   // Make sure the end position of the header is not 0 meaning the header is
   // not empty
