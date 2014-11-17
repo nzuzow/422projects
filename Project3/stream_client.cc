@@ -149,36 +149,35 @@ int main(int argc, char* argv[])
 
   // Setup two strings for the response header and the response body from the
   // server.
-  //string response_header, response_body;
+  string response_header, response_body;
 
   // Setup a buffer array and value for the total length of the received message.
   // The value for the buffer came from the value within test_client. I'm not
   // actually sure why this value was picked though.
-  char buff[65536];
-  int total_received_len = 0;
+  //char buff[65536];
+  //int total_received_len = 0;
 
   // Now call read_header to get the proper information from the socket
-  //client_sock.read_header(response_header, response_body);
+  client_sock.read_header(response_header, response_body);
 
   // Actually need to call receive_response_headers since we don't have one
   // header followed by one large body. This method takes three arguments,
   // the buffer to hold the data in, the maximum length of the buffer, and
   // the total number of bytes received so far.
-  int header_stop = client_sock.receive_response_headers(buff, 65536, total_received_len);
+  //int header_stop = client_sock.receive_response_headers(buff, 65536, total_received_len);
 
   // Make sure the end position of the header is not 0 meaning the header is
   // not empty
-  if( header_stop <= 0)
-  {
-    cout << "There was an error receiving the response from the server." << endl;
-    exit(1);
-  }
+  //if( header_stop <= 0)
+  //{
+  //  cout << "There was an error receiving the response from the server." << endl;
+  //  exit(1);
+  //}
 
 
   // The HTTP_Response::parse construct a response object, and check if
-  // the response is constructed correctly. This will take the buffer of message
-  // headers and the last ending position of the header as arguments.
-  response = HTTP_Response::Parse(buff, header_stop);
+  // the response is constructed correctly.
+  response = HTTP_Response::Parse(response_header.c_str(), response_header.length());
 
   // Now make sure the response is legal
   if( response == NULL)
