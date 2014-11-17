@@ -12,7 +12,9 @@
 #include <iostream>
 #include <netdb.h>
 #include <string>
+#include <sstream>
 #include <unistd.h>
+#include <sys/stat.h>
 
 using namespace std;
 
@@ -25,6 +27,46 @@ void Print_usage(const char* exe_name, ostream& out)
     out << endl;
 }
 
+/*********************************
+ * Name:    Open_local_copy
+ * Purpose: Open a file pointer to store the data in ./Download
+ * Receive: uri - the uri for the object
+ * Return:  The file pointer
+ *********************************/
+// Opens a local copy of the file referenced by the given request URL, for
+// writing.  Ignores any directories in the URL path, instead opening the file
+// in the current directory.  Makes up a filename if none is given.
+//
+// Returns a pointer to the open file, or a NULL pointer if the open fails.
+FILE* Open_local_copy(const URI* uri)
+{
+  FILE* outfile = NULL;
+
+  struct stat sb; // For checking if ./Download exists
+
+  if(stat("./Download", &sb) == -1) // if ./Download does not exist
+  {
+    mkdir("./Download", 0700);   // create it
+  }
+
+  const string& full_path = uri->Get_path();
+  size_t filename_pos = full_path.rfind('/');
+  // find the last '/', the substring after it should be the filename
+
+  if ((filename_pos != string::npos) && // if found a '/'
+      ((filename_pos + 1) < full_path.length())) // or / is not the end of
+                                                 // the string
+  {
+    string fn = string("Download/") + full_path.substr(filename_pos + 1);
+    outfile = fopen(fn.c_str(),"wb");
+  }
+  else
+  {
+    outfile = fopen("Download/index.html", "wb");
+  }
+
+  return outfile;
+}
 
 
 int main(int argc, char* argv[])
@@ -33,6 +75,7 @@ int main(int argc, char* argv[])
   URI* server_uri = NULL;
   HTTP_Request* request = NULL;
   HTTP_Response* response = NULL;
+  FILE* out = NULL;
   Playlist* playlist;
 
   // Look at the command line and figure out what we're playing today.
@@ -60,15 +103,6 @@ int main(int argc, char* argv[])
     exit(1);
   }
 
-  // Use playlist::Parse() to get the contents from the string that is passed in
-  //playlist = Playlist::Parse(server_addr);
-
-  // Now check to make sure the playlist was parsed correctly.
-  //if( playlist == NULL)
-  //{
-  //  cout << "There was an error parsing the playlist." << endl;
-  //  exit(1);
-  //}
 
   // Download the playlist at that URI.
   // Parse it together, too.
@@ -111,7 +145,7 @@ int main(int argc, char* argv[])
     exit(1);
   }
 
-  /* RECEIVE RESPONSE HEADER FROM SERVER */
+  /*** RECEIVE RESPONSE HEADER FROM SERVER ***/
 
   // Setup two strings for the response header and the response body from the
   // server.
@@ -120,7 +154,8 @@ int main(int argc, char* argv[])
   // Now call read_header to get the proper information from the socket
   client_sock.read_header(response_header, response_body);
 
-  // The HTTP_Response::parse construct a response object. and check if
+
+  // The HTTP_Response::parse construct a response object, and check if
   // the response is constructed correctly.
   response = HTTP_Response::Parse(response_header.c_str(), response_header.length());
 
@@ -151,7 +186,61 @@ int main(int argc, char* argv[])
     exit(1);
   }
 
-  /* END OF RECEIVE RESPONSE HEADER FROM SERVER */
+  // Create a variable for the content length
+  int content_len = 0;
+
+  // Also check to make sure the response is in a form we can handle
+  string tmp;
+  response->Get_header_value("Transfer-Encoding", tmp);
+  if(tmp.find("chunked") != string::npos) {
+    //response->chunked = true;
+    cout << "Unable to read chunked encoding." << endl;
+    delete response;
+    exit(1);
+  }
+  else{
+    //response->chunked = false;
+    tmp.clear();
+    response->Get_header_value("Content-Length", tmp);
+    istringstream s(tmp);
+    s >> content_len;
+    //s >> response->content_len;
+  }
+
+  // Do a check to see if content length is greater than 0, which will
+  // signify if it has been changed or not.
+  if( content_len <= 0)
+  {
+    cout << "Error, no content was downloaded." << endl;
+    exit(1);
+  }
+
+  /*** END OF RECEIVE RESPONSE HEADER FROM SERVER ***/
+
+
+  /*** GET REST OF THE MESSAGE BODY AND STORE IT ***/
+
+  /* I'm not actually sure if we need to open a new file here or not. I will
+  look at this more tomorrow. */
+  
+  // Open a local copy in which to store the file.
+  out = Open_local_copy(server_uri);
+  // check
+  if(!out)
+  {
+    cout << "Error opening local copy for writing." << endl;
+    // clean up if failed
+    delete server_uri;
+    exit(1);
+  }
+
+  // Define some variables to use in downloading the content
+  int bytes_written = 0;
+  int bytes_left;
+  int total_data;
+
+
+  /*** END OF GETTING THE REST OF THE MESSAGE BODY AND STORING IT ***/
 
   // Get a video player set up so we can see the video.
 
