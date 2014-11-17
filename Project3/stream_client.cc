@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
   // Make sure the status is 200. If not then we need to print an error
   if( status_code != 200)
   {
-    status_reason = response->Get_reason();
+    string status_reason = response->Get_reason();
 
     cout << "Request failed:" << endl;
     cout << status_code << " " << status_reason << endl;
