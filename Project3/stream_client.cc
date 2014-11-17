@@ -156,7 +156,7 @@ int main(int argc, char* argv[])
 
   // Also check to make sure the response is in a form we can handle
   string tmp;
-  response->get_header_value("Transfer-Encoding", tmp);
+  response->Get_header_value("Transfer-Encoding", tmp);
   if(tmp.find("chunked") != string::npos) {
     //response->chunked = true;
     cout << "Unable to read chunked encoding." << endl;
@@ -166,7 +166,7 @@ int main(int argc, char* argv[])
   else{
     //response->chunked = false;
     tmp.clear();
-    response->get_header_value("Content-Length", tmp);
+    response->Get_header_value("Content-Length", tmp);
     istringstream s(tmp);
     s >> content_len;
     //s >> response->content_len;
