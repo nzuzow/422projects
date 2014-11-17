@@ -14,6 +14,7 @@
 #include <string>
 #include <sstream>
 #include <unistd.h>
+#include <sys/stat.h>
 
 using namespace std;
 
