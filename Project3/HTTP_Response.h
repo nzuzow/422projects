@@ -16,7 +16,11 @@
 #define _HTTP_RESPONSE_H_
 
 #include "HTTP_Message.h"
+#include "TCP_Socket.h"
 #include <string>
+#include <cstdlib>
+#include <ctime>
+#include <sstream>
 
 
 class HTTP_Response : public HTTP_Message
@@ -77,10 +81,15 @@ public:
 	// Returns - The response's status code.
 	unsigned Get_code() const;
 
+
 	// Looks up the description of the response (e.g. "OK").
 	//
 	// Returns - The response's associated reason string.
 	const std::string& Get_reason() const;
+
+	const int get_content_len() const;
+
+        int receive_data(TCP_Socket &sock, std::string &data, int bytes_left = BUFFER_SIZE);
 
 
 	// Prints the response object to a text string, suitable for sending

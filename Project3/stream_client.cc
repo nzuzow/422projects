@@ -15,6 +15,7 @@
 #include <sstream>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <fstream>
 
 using namespace std;
 
@@ -102,6 +103,7 @@ int main(int argc, char* argv[])
     cout << "There was an error parsing the URI." << endl;
     exit(1);
   }
+  cout << "Server uri is good" << endl;
 
 
   // Download the playlist at that URI.
@@ -124,14 +126,17 @@ int main(int argc, char* argv[])
     delete server_uri;
     exit(1);
   }
+  cout << "TCP Socket successful" << endl;
 
   // Send a GET request for the specified file.
   request = HTTP_Request::Create_GET_request(server_uri->Get_path());
   request->Set_host(server_uri->Get_host());
+  cout << "Sent a get request" << std::endl;
 
   // Print the request to a string so we can send it to the HTTP server
   string request_str;
   request->Print(request_str);
+  cout << "Printed the request to a string to send to http server" << endl;
 
   // Try to send the data to the server. If there is an error, then we will
   // print the error to the screen and then exit.
@@ -144,15 +149,18 @@ int main(int argc, char* argv[])
     cerr << msg << endl;
     exit(1);
   }
+  cout << "Sent data to server" << endl;
 
   /*** RECEIVE RESPONSE HEADER FROM SERVER ***/
 
   // Setup two strings for the response header and the response body from the
   // server.
   string response_header, response_body;
+  cout << "set up two string for response header and response body" << endl;
 
   // Now call read_header to get the proper information from the socket
   client_sock.read_header(response_header, response_body);
+  cout << "called read_header to get proper info from socket" << endl;
 
 
   // The HTTP_Response::parse construct a response object, and check if
@@ -168,6 +176,7 @@ int main(int argc, char* argv[])
     delete server_uri;
     exit(1);
   }
+  cout << "constructed a response object and it was constructed correctly" << endl;
 
   // Even if the response is constructed correctly, we still need to check for
   // the proper status of the server
@@ -217,6 +226,7 @@ int main(int argc, char* argv[])
 
   /*** END OF RECEIVE RESPONSE HEADER FROM SERVER ***/
 
+  cout << "end of receive response header from server, get rest of body and store it" << endl;
 
   /*** GET REST OF THE MESSAGE BODY AND STORE IT ***/
 
@@ -239,10 +249,58 @@ int main(int argc, char* argv[])
   int bytes_left;
   int total_data;
 
+  bytes_left = response->get_content_len();
+  cout << "Bytes left: " << bytes_left << endl;
+  do {
+	fwrite(response_body.c_str(), 1, response_body.length(), out);
+ 	bytes_written += response_body.length();
+	bytes_left -= response_body.length();
+	response_body.clear();
+	try
+	{
+		response->receive_data(client_sock, response_body, bytes_left);
+	}
+	catch (string msg)
+	{
+		cout << msg << endl;
+		delete response;
+		delete server_uri;
+		fclose(out);
+		client_sock.Close();
+		exit(1);
+	}
+  } while (bytes_left > 0);
+
+  cout << "End of getting rest of body and storing it" << endl;
 
   /*** END OF GETTING THE REST OF THE MESSAGE BODY AND STORING IT ***/
 
   // Get a video player set up so we can see the video.
+
+  ifstream video_in("a"/*NAME OF FILE */);
+  if (!video_in.good()) {
+	cout << "Error opening " << "NAME OF FILE" << endl;
+	return 2;
+  }
+  Video_Player* player = Video_Player::Create();
+  if (player == NULL) {
+	cout << "Error initializing video player." << endl;
+	return 3;
+  }
+  player->Start();
+  cout << "Start playback." << endl;
+  char data_buffer[65336];
+  while (video_in.good()) {
+	size_t bytes_read = video_in.readsome(data_buffer, sizeof(data_buffer));
+	if (bytes_read == 0) break;
+	player->Stream(data_buffer, bytes_read);
+  }
+  // Won't know how long until it ends because it is in separate thread.
+  // Therefore we wait until window is closed by user to guarantee video is not running.
+  player->Wait_for_close();
+  // Clean up.
+  delete player;
+  return 0;
 
   // Download and stream each of the video segments in the playlist,
   // in order.
