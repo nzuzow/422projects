@@ -12,6 +12,7 @@
 #include <iostream>
 #include <netdb.h>
 #include <string>
+#include <sstream>
 #include <unistd.h>
 
 using namespace std;
