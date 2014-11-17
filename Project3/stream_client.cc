@@ -136,7 +136,7 @@ int main(int argc, char* argv[])
 
   // Even if the response is constructed correctly, we still need to check for
   // the proper status of the server
-  string status_code;
+  unsigned status_code;
 
   status_code = response->Get_code();
 
