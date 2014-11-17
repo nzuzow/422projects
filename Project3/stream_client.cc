@@ -151,6 +151,27 @@ int main(int argc, char* argv[])
     exit(1);
   }
 
+  // Create a variable for the content length
+  int content_len = 0;
+
+  // Also check to make sure the response is in a form we can handle
+  string tmp;
+  response->get_header_value("Transfer-Encoding", tmp);
+  if(tmp.find("chunked") != string::npos) {
+    //response->chunked = true;
+    cout << "Unable to read chunked encoding." << endl;
+    delete response;
+    exit(1);
+  }
+  else{
+    //response->chunked = false;
+    tmp.clear();
+    response->get_header_value("Content-Length", tmp);
+    istringstream s(tmp);
+    s >> content_len;
+    //s >> response->content_len;
+  }
+
   /* END OF RECEIVE RESPONSE HEADER FROM SERVER */
 
   // Get a video player set up so we can see the video.
