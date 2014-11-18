@@ -519,6 +519,8 @@ int main(int argc, char* argv[])
 		seg_bytes_left = seg_content_len;
 
 		cout << "Bytes left: " << seg_bytes_left << endl;
+		
+		int num_of_seg_bytes = 1200;
 
 		//vector<int> seg_segment_bytes;
 		//while(bytes_written < content_len)
@@ -528,8 +530,8 @@ int main(int argc, char* argv[])
 
 		do {
 		//fwrite(response_body.c_str(), 1, response_body.length(), out);
-	 	seg_bytes_written += seg_response_body.length();
-		seg_bytes_left -= seg_response_body.length();
+	 	seg_bytes_written += num_of_seg_bytes; //seg_response_body.length();
+		seg_bytes_left -= num_of_seg_bytes; //seg_response_body.length();
 
 		cout << "bytes written is: " << seg_bytes_written << endl;
 		cout << "bytes left is: " << seg_bytes_left << endl;
@@ -542,13 +544,13 @@ int main(int argc, char* argv[])
 
 		// Append the response from the socket to the data_string before clearing the
 		// response_body.
-		seg_data_string.append(seg_response_body.c_str(), seg_response_body.length());
+		seg_data_string.append(seg_response_body.c_str(), num_of_seg_bytes); //seg_response_body.length());
 
 		seg_response_body.clear();
 		try
 		{
 			//response->receive_data(client_sock, response_body, bytes_left);
-		  seg_bytes_read = seg_sock.read_data(seg_response_body, seg_bytes_left);
+		  seg_bytes_read = seg_sock.read_data(seg_response_body, num_of_seg_bytes); //seg_bytes_left);
 		}
 		catch (string msg)
 		{
