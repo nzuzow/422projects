@@ -279,7 +279,7 @@ int main(int argc, char* argv[])
 
   // Append the response from the socket to the data_string before clearing the
   // response_body.
-  data_string.append(response_body, bytes_written);
+  data_string.append(response_body.c_str(), response_body.length());
 
 	response_body.clear();
 	try
@@ -304,6 +304,18 @@ int main(int argc, char* argv[])
   cout << "End of getting rest of body and storing it" << endl;
 
   /*** END OF GETTING THE REST OF THE MESSAGE BODY AND STORING IT ***/
+
+  // Now try to parse the playlist
+  playlist = Playlist::Parse(data_string, data_string.length());
+
+  if( playlist == NULL)
+  {
+    cout << "Error, there was a problem downloading the playlist." << endl;
+    exit(1);
+  }
+
+  // Used for debugging
+  cout << "The playlist has " << playlist->Get_num_segments() << " segments." << endl;
 
   // Get a video player set up so we can see the video.
 
