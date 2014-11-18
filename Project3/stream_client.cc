@@ -232,33 +232,43 @@ int main(int argc, char* argv[])
 
   /* I'm not actually sure if we need to open a new file here or not. I will
   look at this more tomorrow. */
-  
+
   // Open a local copy in which to store the file.
-  out = Open_local_copy(server_uri);
+  //out = Open_local_copy(server_uri);
   // check
-  if(!out)
+  /*if(!out)
   {
     cout << "Error opening local copy for writing." << endl;
     // clean up if failed
     delete server_uri;
     exit(1);
-  }
+  }*/
 
   // Define some variables to use in downloading the content
   int bytes_written = 0;
   int bytes_left;
   int total_data;
+  int bytes_read;
 
-  bytes_left = response->get_content_len();
+  // Define a buffer for the segments of the video file. I got the size of
+  // the buffer from the test_client, however I am not exactly sure where
+  // this number comes from.
+  char segment_buffer[65536];
+
+  //bytes_left = response->get_content_len();
+  // content_len is defined above.
+  bytes_left = content_len;
+
   cout << "Bytes left: " << bytes_left << endl;
   do {
-	fwrite(response_body.c_str(), 1, response_body.length(), out);
+	//fwrite(response_body.c_str(), 1, response_body.length(), out);
  	bytes_written += response_body.length();
 	bytes_left -= response_body.length();
 	response_body.clear();
 	try
 	{
-		response->receive_data(client_sock, response_body, bytes_left);
+		//response->receive_data(client_sock, response_body, bytes_left);
+    bytes_read = client_sock.read_data(response_body, bytes_left);
 	}
 	catch (string msg)
 	{

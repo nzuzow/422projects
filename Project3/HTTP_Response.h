@@ -87,10 +87,6 @@ public:
 	// Returns - The response's associated reason string.
 	const std::string& Get_reason() const;
 
-	const int get_content_len() const;
-
-        int receive_data(TCP_Socket &sock, std::string &data, int bytes_left = BUFFER_SIZE);
-
 
 	// Prints the response object to a text string, suitable for sending
 	// to an HTTP client.  Includes the terminating blank line and all

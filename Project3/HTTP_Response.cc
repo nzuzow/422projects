@@ -137,7 +137,7 @@ void HTTP_Response::Print(string& output_string) const
 	// Take that and toss on the ending to get the first line...
 	output_string = response_line.str();
 	output_string += line_ending;
-	
+
 	// ...and then add the associated headers.
 	HTTP_Message::Print(output_string);
 }
@@ -161,22 +161,6 @@ void HTTP_Response::Print(char* output_buffer, unsigned buffer_length) const
 	HTTP_Message::Print(output_buffer, buffer_length);
 }
 
-const int HTTP_Response::get_content_len() const
-{
-	return content_len;
-}
-
-int HTTP_Response::receive_data(TCP_Socket &sock, string &response_data, int bytes_left)
-{
-    if(bytes_left > BUFFER_SIZE)
-    {
-        return sock.read_data(response_data, BUFFER_SIZE);
-    }
-    else
-    {
-        return sock.read_data(response_data, bytes_left);
-    }
-}
 
 void HTTP_Response::Set_version(const string& version)
 {
