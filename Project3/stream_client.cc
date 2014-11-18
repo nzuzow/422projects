@@ -16,6 +16,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <fstream>
+#include <vector>
 
 using namespace std;
 
@@ -264,6 +265,7 @@ int main(int argc, char* argv[])
 
   cout << "Bytes left: " << bytes_left << endl;
 
+  vector<int> segment_bytes;
   //while(bytes_written < content_len)
   //{
 
@@ -276,6 +278,9 @@ int main(int argc, char* argv[])
 
   // Add elements to the segment buffer
   //segment_buffer
+
+  // Add the number of bytes for this segment to the vector
+  segment_bytes.push_back(response_body.length())
 
   // Append the response from the socket to the data_string before clearing the
   // response_body.
@@ -339,8 +344,9 @@ int main(int argc, char* argv[])
     // For testing purposes
     cout << "the segment uri for " << i << " is: " << segment_uri << endl;
 
-    int segment_length = playlist->Get_segment_duration(i);
-
+    //int segment_length = playlist->Get_segment_duration(i);
+    int segment_length = segment_bytes[i];
+    
     // For testing
     cout << "the segment length for " << i << " is: " << segment_length << endl;
 
