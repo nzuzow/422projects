@@ -306,7 +306,7 @@ int main(int argc, char* argv[])
   /*** END OF GETTING THE REST OF THE MESSAGE BODY AND STORING IT ***/
 
   // Now try to parse the playlist
-  playlist = Playlist::Parse(data_string, data_string.length());
+  playlist = Playlist::Parse((char *) data_string, data_string.length());
 
   if( playlist == NULL)
   {
