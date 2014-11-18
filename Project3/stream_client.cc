@@ -315,12 +315,36 @@ int main(int argc, char* argv[])
   }
 
   // Used for debugging
-  cout << "The playlist has " << playlist->Get_num_segments() << " segments." << endl;
+  cout << "The playlist contains " << playlist->Get_num_segments() << " segments." << endl;
 
   // Get a video player set up so we can see the video.
+  Video_Player* player = Video_Player::Create();
+  if (player == NULL) {
+    cout << "Error initializing video player." << endl;
+    return 3;
+  }
+  cout << "Player created." << endl;
 
-  ifstream video_in("a"/*NAME OF FILE */);
-  if (!video_in.good()) {
+  player->Start();
+
+  // Now download and stream each of the video segments in the playlist, in order
+  int num_segments = playlist->Get_num_segments();
+  for( int i = 0; i < num_segments; i++)
+  {
+    // Now get the URI for the individual segment. There is a method within
+    // the playlist class called get_segment_uri which will return the uri
+    // for the individual segment.
+    string segment_uri = playlist->Get_segment_uri();
+
+    int segment_length = playlist->Get_segment_duration(i);
+
+    // Now we need to print to the screen that we are obtaining the next segment
+    cout << "Fetching segment " << i << endl;
+    player->Stream(segment_uri.c_str(), segment_length);
+  }
+
+  //ifstream video_in("a"/*NAME OF FILE */);
+  /*if (!video_in.good()) {
 	cout << "Error opening " << "NAME OF FILE" << endl;
 	return 2;
   }
@@ -342,7 +366,7 @@ int main(int argc, char* argv[])
   player->Wait_for_close();
   // Clean up.
   delete player;
-  return 0;
+  return 0;*/
 
   // Download and stream each of the video segments in the playlist,
   // in order.
