@@ -336,8 +336,14 @@ int main(int argc, char* argv[])
     // for the individual segment.
     string segment_uri = playlist->Get_segment_uri(i);
 
+    // For testing purposes
+    cout << "the segment uri for " << i << " is: " << segment_uri << endl;
+
     int segment_length = playlist->Get_segment_duration(i);
 
+    // For testing
+    cout << "the segment length for " << i << " is: " << stgment_length << endl;
+    
     // Now we need to print to the screen that we are obtaining the next segment
     cout << "Fetching segment " << i << endl;
     player->Stream(segment_uri.c_str(), segment_length);
