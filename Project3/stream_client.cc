@@ -343,6 +343,12 @@ int main(int argc, char* argv[])
     player->Stream(segment_uri.c_str(), segment_length);
   }
 
+  // Won't know how long until it ends because it is in separate thread.
+  // Therefore we wait until window is closed by user to guarantee video is not running.
+  player->Wait_for_close();
+  // Clean up.
+  delete player;
+
   //ifstream video_in("a"/*NAME OF FILE */);
   /*if (!video_in.good()) {
 	cout << "Error opening " << "NAME OF FILE" << endl;
