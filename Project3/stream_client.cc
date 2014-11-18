@@ -258,7 +258,7 @@ int main(int argc, char* argv[])
   // the buffer from the test_client, however I am not exactly sure where
   // this number comes from.
   char segment_buffer[65536];
-	
+
 	cout << "Content length is: " << content_len << endl;
 
   //bytes_left = response->get_content_len();
@@ -277,7 +277,7 @@ int main(int argc, char* argv[])
 	//fwrite(response_body.c_str(), 1, response_body.length(), out);
  	bytes_written += response_body.length();
 	bytes_left -= response_body.length();
-	
+
 	cout << "bytes written is: " << bytes_written << endl;
 	cout << "bytes left is: " << bytes_left << endl;
 	cout << "response body length is: " << response_body.length() << endl;
@@ -302,7 +302,7 @@ int main(int argc, char* argv[])
 		cout << msg << endl;
 		delete response;
 		delete server_uri;
-		fclose(out);
+		//fclose(out);
 		client_sock.Close();
 		exit(1);
 	}
@@ -511,7 +511,7 @@ int main(int argc, char* argv[])
 		// the buffer from the test_client, however I am not exactly sure where
 		// this number comes from.
 		char seg_segment_buffer[65536];
-	
+
 		cout << "Content length is: " << seg_content_len << endl;
 
 		//bytes_left = response->get_content_len();
@@ -520,7 +520,7 @@ int main(int argc, char* argv[])
 
 		cout << "Bytes left: " << seg_bytes_left << endl;
 
-		vector<int> seg_segment_bytes;
+		//vector<int> seg_segment_bytes;
 		//while(bytes_written < content_len)
 		//{
 
@@ -530,7 +530,7 @@ int main(int argc, char* argv[])
 		//fwrite(response_body.c_str(), 1, response_body.length(), out);
 	 	seg_bytes_written += seg_response_body.length();
 		seg_bytes_left -= seg_response_body.length();
-	
+
 		cout << "bytes written is: " << seg_bytes_written << endl;
 		cout << "bytes left is: " << seg_bytes_left << endl;
 		cout << "response body length is: " << seg_response_body.length() << endl;
@@ -538,7 +538,7 @@ int main(int argc, char* argv[])
 		//segment_buffer
 
 		// Add the number of bytes for this segment to the vector
-		seg_segment_bytes.push_back(seg_response_body.length());
+		//seg_segment_bytes.push_back(seg_response_body.length());
 
 		// Append the response from the socket to the data_string before clearing the
 		// response_body.
@@ -555,7 +555,7 @@ int main(int argc, char* argv[])
 			cout << msg << endl;
 			delete seg_response;
 			delete seg_uri_obj;
-			fclose(out);
+			//fclose(out);
 			seg_sock.Close();
 			exit(1);
 		}
@@ -572,7 +572,7 @@ int main(int argc, char* argv[])
 
 
 
-		
+
 
 
 
@@ -587,20 +587,20 @@ int main(int argc, char* argv[])
     // Now get the URI for the individual segment. There is a method within
     // the playlist class called get_segment_uri which will return the uri
     // for the individual segment.
-    string segment_uri = playlist->Get_segment_uri(i);
+    //string segment_uri = playlist->Get_segment_uri(i);
 
     // For testing purposes
-    cout << "the segment uri for " << i << " is: " << segment_uri << endl;
+    //cout << "the segment uri for " << i << " is: " << segment_uri << endl;
 
     //int segment_length = playlist->Get_segment_duration(i);
-    int segment_length = segment_bytes[i];
-    
+    //int segment_length = segment_bytes[i];
+
     // For testing
-    cout << "the segment length for " << i << " is: " << segment_length << endl;
+    //cout << "the segment length for " << i << " is: " << segment_length << endl;
 
     // Now we need to print to the screen that we are obtaining the next segment
     cout << "Fetching segment " << i << endl;
-    player->Stream(segment_uri.c_str(), segment_length);
+    player->Stream(seg_data_string.c_str(), seg_content_len);
   }
 
   // Won't know how long until it ends because it is in separate thread.
