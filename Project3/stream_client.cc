@@ -250,6 +250,9 @@ int main(int argc, char* argv[])
   int total_data;
   int bytes_read;
 
+  // Define a string to store all the data without clearing the previous data
+  string data_string;
+
   // Define a buffer for the segments of the video file. I got the size of
   // the buffer from the test_client, however I am not exactly sure where
   // this number comes from.
@@ -260,10 +263,24 @@ int main(int argc, char* argv[])
   bytes_left = content_len;
 
   cout << "Bytes left: " << bytes_left << endl;
+
+  //while(bytes_written < content_len)
+  //{
+
+  //}
+
   do {
 	//fwrite(response_body.c_str(), 1, response_body.length(), out);
  	bytes_written += response_body.length();
 	bytes_left -= response_body.length();
+
+  // Add elements to the segment buffer
+  //segment_buffer
+
+  // Append the response from the socket to the data_string before clearing the
+  // response_body.
+  data_string.append(response_body, bytes_written);
+
 	response_body.clear();
 	try
 	{
@@ -280,6 +297,9 @@ int main(int argc, char* argv[])
 		exit(1);
 	}
   } while (bytes_left > 0);
+
+  cout << "The data string is: " << data_string << endl;
+  cout << "The size of the data string is: " << data_string.length() << endl << endl;
 
   cout << "End of getting rest of body and storing it" << endl;
 
