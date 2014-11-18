@@ -334,7 +334,7 @@ int main(int argc, char* argv[])
     // Now get the URI for the individual segment. There is a method within
     // the playlist class called get_segment_uri which will return the uri
     // for the individual segment.
-    string segment_uri = playlist->Get_segment_uri();
+    string segment_uri = playlist->Get_segment_uri(i);
 
     int segment_length = playlist->Get_segment_duration(i);
 
