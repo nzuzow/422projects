@@ -39,9 +39,9 @@ void TCP_Socket::create_socket()
     Close();
 
     //first try to make the TCP socket
-    cout << "In create_socket before socket" << endl;
+    //cout << "In create_socket before socket" << endl;
 	sock = socket(AF_INET, SOCK_STREAM, 0);
-	cout << "The sock is: " << sock << endl;
+	//cout << "The sock is: " << sock << endl;
     if(sock < 0)
     {
         throw string("TCP_Socket Exception: Unable to create socket");
@@ -296,8 +296,8 @@ int TCP_Socket::read_n_bytes(void *vptr, int n)
 
     while(n_left > 0) // keeps reading until n is satisfied
     {
-		cout << "In while in read n bytes" << endl;
-		cout << "n_left is: " << n_left << endl;
+		//cout << "In while in read n bytes" << endl;
+		//cout << "n_left is: " << n_left << endl;
 		
         if((n_read = read(sock, ptr, n_left)) < 0)
         {
@@ -469,39 +469,39 @@ int TCP_Socket::read_data(string &data, int bytes_left)
     int total = 0, l;
     char buffer[BUFFER_SIZE];
 
-    cout << "In read_data before the while." << endl;
+    //cout << "In read_data before the while." << endl;
 
     while(total < bytes_left)
     {
-        cout << "In read_data in the while. the total is: " << total << " and bytes left is: " << bytes_left << endl;
+        //cout << "In read_data in the while. the total is: " << total << " and bytes left is: " << bytes_left << endl;
         
         memset(buffer, 0, sizeof(buffer));
-		cout << "In read_data before read_n_bytes" << endl;
+		//cout << "In read_data before read_n_bytes" << endl;
 
         l = read_n_bytes(buffer, bytes_left);
 		
-		cout << "In read_data after read_n_bytes" << endl;
+		//cout << "In read_data after read_n_bytes" << endl;
 
         if(l < 0)
         {
-			cout << "In if in read_data" << endl;
+			//cout << "In if in read_data" << endl;
 
             throw string("TCP_Socket Exception: error reading all data from socket");
             return -1;
         }
         else if(l == 0)
         {
-			cout << "In else if in read_data" << endl;
+			//cout << "In else if in read_data" << endl;
             break;
         }
 		
-		cout << "after if/else statement in read_data" << endl;
+		//cout << "after if/else statement in read_data" << endl;
 
         data.append(buffer, l);
         total += l;
     }
 	
-	cout << "In read_data outside the while loop" << endl;
+	//cout << "In read_data outside the while loop" << endl;
     return total;
 }
 
