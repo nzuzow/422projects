@@ -478,6 +478,17 @@ int main(int argc, char* argv[])
 		  exit(1);
 		}
 
+    // Add in another check to see if we are downloading some content after the
+    // header unintentionally. If the data buffer had any content added to it
+    // from the read_header, then we need to append that data to the response header buffer
+    if( seg_response_body.length() > 0)
+    {
+      // I think we can actually just send this right to the video player
+      player->Stream(seg_response_body.c_str(), seg_response_body.length());
+
+      //seg_response_header.append(seg_response_body.c_str(), seg_response_body.length());
+    }
+
 		/*** END OF RECEIVE RESPONSE HEADER FROM SERVER ***/
 
 		//cout << "end of receive response header from server, get rest of body and store it" << endl;
@@ -520,7 +531,7 @@ int main(int argc, char* argv[])
 		seg_bytes_left = seg_content_len;
 
 		//cout << "Bytes left: " << seg_bytes_left << endl;
-		
+
 		int num_of_seg_bytes = 1200;
 
 		//vector<int> seg_segment_bytes;
@@ -553,6 +564,10 @@ int main(int argc, char* argv[])
 		{
 			//response->receive_data(client_sock, response_body, bytes_left);
 		  seg_bytes_read = seg_sock.read_data(seg_response_body, num_of_seg_bytes); //seg_bytes_left);
+
+      // This is a quick test. What if we just send to the player here? Maybe we don't need to get
+      // all of the data into a buffer here.
+      player->Stream(seg_response_body.c_str(), seg_bytes_read);
 		}
 		catch (string msg)
 		{
@@ -604,11 +619,11 @@ int main(int argc, char* argv[])
 
     // Now we need to print to the screen that we are obtaining the next segment
     cout << "Fetching segment " << i << endl;
-    while (seg_stream.good()) {
-	size_t bytes_read = seg_stream.readsome(seg_segment_buffer, sizeof(seg_segment_buffer));
-	if (bytes_read == 0) break;
-        player->Stream(seg_segment_buffer, bytes_read);
-    }
+    /*while (seg_stream.good()) {
+	     size_t bytes_read = seg_stream.readsome(seg_segment_buffer, sizeof(seg_segment_buffer));
+	     if (bytes_read == 0) break;
+       player->Stream(seg_segment_buffer, bytes_read);
+    }*/
   }
 
   // Won't know how long until it ends because it is in separate thread.
