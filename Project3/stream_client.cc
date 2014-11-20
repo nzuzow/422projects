@@ -310,7 +310,7 @@ int main(int argc, char* argv[])
 
   if( playlist == NULL)
   {
-    cout << "Error, there was a problem downloading the playlist." << endl;
+    cout << "Error, playlist cannot be parsed." << endl;
     exit(1);
   }
 
@@ -494,7 +494,7 @@ int main(int argc, char* argv[])
 
 		// Define some variables to use in downloading the content
 		int seg_bytes_written = 0;
-		int seg_bytes_left;
+		unsigned seg_bytes_left;
 		int seg_total_data;
 		int seg_bytes_read;
 
@@ -509,7 +509,9 @@ int main(int argc, char* argv[])
 		// content_len is defined above.
 		seg_bytes_left = seg_content_len;
 
-
+		// Now we need to print to the screen that we are obtaining the next segment
+		cout << "Fetching segment " << i << endl;
+		
 		do {
 		//fwrite(response_body.c_str(), 1, response_body.length(), out);
 		int num_of_seg_bytes = seg_response_body.size();
@@ -580,7 +582,7 @@ int main(int argc, char* argv[])
     //cout << "the segment length for " << i << " is: " << segment_length << endl;
 
     // Now we need to print to the screen that we are obtaining the next segment
-    cout << "Fetching segment " << i << endl;
+    //cout << "Fetching segment " << i << endl;
   }
 
   // Won't know how long until it ends because it is in separate thread.
