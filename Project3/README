@@ -1,8 +1,10 @@
-1. Partner: Nick Zuzow
+
+1. Name: Nick Zuzow
+	 Partner: Justin Grothe
 
 2. How to compile. Which machines are tested.
-	make will compile
-	This code was tested on Marge and works.
+	 make will compile
+	 This code was tested on Marge and works.
 
 3. Logs:
 <174 marge:~/CSE422/422projects/Project3 >stream_client http://www.cse.msu.edu/~cse422b/fs14/lab3/San_Diego_Clip/San_Diego_Clip.m3u8
@@ -107,4 +109,3 @@ Fetching segment 97
 Fetching segment 98
 Fetching segment 99
 Waiting for playback to finish
-
