@@ -29,48 +29,6 @@ void Print_usage(const char* exe_name, ostream& out)
     out << endl;
 }
 
-/*********************************
- * Name:    Open_local_copy
- * Purpose: Open a file pointer to store the data in ./Download
- * Receive: uri - the uri for the object
- * Return:  The file pointer
- *********************************/
-// Opens a local copy of the file referenced by the given request URL, for
-// writing.  Ignores any directories in the URL path, instead opening the file
-// in the current directory.  Makes up a filename if none is given.
-//
-// Returns a pointer to the open file, or a NULL pointer if the open fails.
-FILE* Open_local_copy(const URI* uri)
-{
-  FILE* outfile = NULL;
-
-  struct stat sb; // For checking if ./Download exists
-
-  if(stat("./Download", &sb) == -1) // if ./Download does not exist
-  {
-    mkdir("./Download", 0700);   // create it
-  }
-
-  const string& full_path = uri->Get_path();
-  size_t filename_pos = full_path.rfind('/');
-  // find the last '/', the substring after it should be the filename
-
-  if ((filename_pos != string::npos) && // if found a '/'
-      ((filename_pos + 1) < full_path.length())) // or / is not the end of
-                                                 // the string
-  {
-    string fn = string("Download/") + full_path.substr(filename_pos + 1);
-    outfile = fopen(fn.c_str(),"wb");
-  }
-  else
-  {
-    outfile = fopen("Download/index.html", "wb");
-  }
-
-  return outfile;
-}
-
-
 int main(int argc, char* argv[])
 {
   std::string server_addr;
@@ -89,7 +47,6 @@ int main(int argc, char* argv[])
 
   // Get the server address from the command line argument
   server_addr = argv[1];
-  //cout << "You entered " << server_addr << " as the address of the server." << endl;
 
   // Parse the playlist URI
   // Handle bad URI
@@ -104,8 +61,6 @@ int main(int argc, char* argv[])
     cout << "There was an error parsing the URI." << endl;
     exit(1);
   }
-  //cout << "Server uri is good" << endl;
-
 
   // Download the playlist at that URI.
   // Parse it together, too.
@@ -127,17 +82,14 @@ int main(int argc, char* argv[])
     delete server_uri;
     exit(1);
   }
-  //cout << "TCP Socket successful" << endl;
 
   // Send a GET request for the specified file.
   request = HTTP_Request::Create_GET_request(server_uri->Get_path());
   request->Set_host(server_uri->Get_host());
-  //cout << "Sent a get request" << std::endl;
 
   // Print the request to a string so we can send it to the HTTP server
   string request_str;
   request->Print(request_str);
-  //cout << "Printed the request to a string to send to http server" << endl;
 
   // Try to send the data to the server. If there is an error, then we will
   // print the error to the screen and then exit.
@@ -150,19 +102,15 @@ int main(int argc, char* argv[])
     cerr << msg << endl;
     exit(1);
   }
-  //cout << "Sent data to server" << endl;
 
   /*** RECEIVE RESPONSE HEADER FROM SERVER ***/
 
   // Setup two strings for the response header and the response body from the
   // server.
   string response_header, response_body;
-  //cout << "set up two string for response header and response body" << endl;
 
   // Now call read_header to get the proper information from the socket
   client_sock.read_header(response_header, response_body);
-  //cout << "called read_header to get proper info from socket" << endl;
-
 
   // The HTTP_Response::parse construct a response object, and check if
   // the response is constructed correctly.
@@ -177,7 +125,6 @@ int main(int argc, char* argv[])
     delete server_uri;
     exit(1);
   }
-  //cout << "constructed a response object and it was constructed correctly" << endl;
 
   // Even if the response is constructed correctly, we still need to check for
   // the proper status of the server
@@ -227,23 +174,7 @@ int main(int argc, char* argv[])
 
   /*** END OF RECEIVE RESPONSE HEADER FROM SERVER ***/
 
-  //cout << "end of receive response header from server, get rest of body and store it" << endl;
-
   /*** GET REST OF THE MESSAGE BODY AND STORE IT ***/
-
-  /* I'm not actually sure if we need to open a new file here or not. I will
-  look at this more tomorrow. */
-
-  // Open a local copy in which to store the file.
-  //out = Open_local_copy(server_uri);
-  // check
-  /*if(!out)
-  {
-    cout << "Error opening local copy for writing." << endl;
-    // clean up if failed
-    delete server_uri;
-    exit(1);
-  }*/
 
   // Define some variables to use in downloading the content
   int bytes_written = 0;
@@ -258,55 +189,37 @@ int main(int argc, char* argv[])
   // the buffer from the test_client, however I am not exactly sure where
   // this number comes from.
 
-	//cout << "Content length is: " << content_len << endl;
-
   // content_len is defined above.
   bytes_left = content_len;
 
   do {
-	//fwrite(response_body.c_str(), 1, response_body.length(), out);
  	bytes_written += response_body.length();
 	bytes_left -= response_body.length();
 
-	//cout << "bytes written is: " << bytes_written << endl;
-	//cout << "bytes left is: " << bytes_left << endl;
-	//cout << "response body length is: " << response_body.length() << endl;
-  // Add elements to the segment buffer
-  //segment_buffer
-
-  // Add the number of bytes for this segment to the vector
-
-  // Append the response from the socket to the data_string before clearing the
-  // response_body.
-  data_string.append(response_body.c_str(), response_body.length());
+  	// Append the response from the socket to the data_string before clearing the
+  	// response_body.
+  	data_string.append(response_body.c_str(), response_body.length());
 
 	response_body.clear();
 	try
 	{
-		//response->receive_data(client_sock, response_body, bytes_left);
-    bytes_read = client_sock.read_data(response_body, bytes_left);
+    		bytes_read = client_sock.read_data(response_body, bytes_left);
 	}
 	catch (string msg)
 	{
 		cout << msg << endl;
 		delete response;
 		delete server_uri;
-		//fclose(out);
 		client_sock.Close();
 		exit(1);
 	}
   } while (bytes_left > 0);
-
-  //cout << "End of getting rest of body and storing it" << endl;
 
   /*** END OF GETTING THE REST OF THE MESSAGE BODY AND STORING IT ***/
 
   // Now try to parse the playlist
   playlist = Playlist::Parse(data_string.c_str(), data_string.length());
   
-  //TEST print the output string from the playlist
-  //cout << data_string << endl;
-
   if( playlist == NULL)
   {
     cout << "Error, playlist cannot be parsed." << endl;
@@ -322,7 +235,6 @@ int main(int argc, char* argv[])
     cout << "Error initializing video player." << endl;
     return 3;
   }
-  //cout << "Player created." << endl;
 
   player->Start();
 
@@ -331,11 +243,11 @@ int main(int argc, char* argv[])
   for( int i = 0; i < num_segments; i++)
   {
 		// Now get the URI for the individual segment. There is a method within
-    // the playlist class called get_segment_uri which will return the uri
-    // for the individual segment.
-    string segment_uri = playlist->Get_segment_uri(i);
+    		// the playlist class called get_segment_uri which will return the uri
+    		// for the individual segment.
+    		string segment_uri = playlist->Get_segment_uri(i);
 
-	  // Parse the playlist URI
+	  	// Parse the playlist URI
 		// Handle bad URI
 		// Use URI::Parse() to get the proper components from the given string
 		URI* seg_uri_obj = URI::Parse(segment_uri);
@@ -348,11 +260,6 @@ int main(int argc, char* argv[])
 		  cout << "There was an error parsing the URI." << endl;
 		  exit(1);
 		}
-		//cout << "Server uri is good" << endl;
-
-
-		// Download the playlist at that URI.
-		// Parse it together, too.
 
 		// TCP_Socket class to handle TCP communications.
 		TCP_Socket seg_sock;
@@ -448,7 +355,6 @@ int main(int argc, char* argv[])
 		  seg_response->Get_header_value("Content-Length", seg_tmp);
 		  istringstream s(seg_tmp);
 		  s >> seg_content_len;
-		  //s >> response->content_len;
 		}
 		
 		
@@ -460,20 +366,16 @@ int main(int argc, char* argv[])
 		  exit(1);
 		}
 
-    // Add in another check to see if we are downloading some content after the
-    // header unintentionally. If the data buffer had any content added to it
-    // from the read_header, then we need to append that data to the response header buffer
-    if( seg_response_body.length() > 0)
-    {
-      // I think we can actually just send this right to the video player
-      player->Stream(seg_response_body.c_str(), seg_response_body.length());
-      //cout << seg_response_body.size() << "!!!!" << endl;
-	  
-	  //TEST
-	  seg_content_len -= seg_response_body.length();
-
-      //seg_response_header.append(seg_response_body.c_str(), seg_response_body.length());
-    }
+    		// Add in another check to see if we are downloading some content after the
+    		// header unintentionally. If the data buffer had any content added to it
+    		// from the read_header, then we need to append that data to the response header buffer
+    		if( seg_response_body.length() > 0)
+    		{
+      			// I think we can actually just send this right to the video player
+      			player->Stream(seg_response_body.c_str(), seg_response_body.length());
+	  		seg_content_len -= seg_response_body.length();
+      			//seg_response_header.append(seg_response_body.c_str(), seg_response_body.length());
+    		}
 
 		/*** END OF RECEIVE RESPONSE HEADER FROM SERVER ***/
 
@@ -490,122 +392,61 @@ int main(int argc, char* argv[])
 		string seg_data_string;
 		stringstream seg_stream;
 
-		// Define a buffer for the segments of the video file. I got the size of
-		// the buffer from the test_client, however I am not exactly sure where
-		// this number comes from.
-
 		// content_len is defined above.
 		seg_bytes_left = seg_content_len;
 
 		// Now we need to print to the screen that we are obtaining the next segment
-		cout << "Fetching segment " << i << endl;
+		cout << "Fetching segment " << i+1 << endl;
 		
 		do {
-		//Test
-		//cout << "seg_bytes_left initially is: " << seg_bytes_left << endl;
-
-		//fwrite(response_body.c_str(), 1, response_body.length(), out);
-		int num_of_seg_bytes = seg_response_body.size();
-	 	seg_bytes_written += num_of_seg_bytes; //seg_response_body.length();
+			int num_of_seg_bytes = seg_response_body.size();
+	 		seg_bytes_written += num_of_seg_bytes; //seg_response_body.length();
 		
-		//TEST
-		if( num_of_seg_bytes > seg_bytes_left)
-		{
-			num_of_seg_bytes = seg_bytes_left;
+			if( num_of_seg_bytes > seg_bytes_left)
+			{
+				num_of_seg_bytes = seg_bytes_left;
+				seg_response_body.clear();
+				try
+				{
+					seg_bytes_read = seg_sock.read_data(seg_response_body, num_of_seg_bytes);
+					// This is a quick test. What if we just send to the player here? Maybe we don't need to get
+					// all of the data into a buffer here.
+					player->Stream(seg_response_body.c_str(), seg_bytes_read);
+				}
+				catch (string msg)
+				{
+					cout << msg << endl;
+					delete seg_response;
+					delete seg_uri_obj;
+					seg_sock.Close();
+					exit(1);
+				}
+			}
+		
+		
+			seg_bytes_left -= num_of_seg_bytes; //seg_response_body.length();
+			if(seg_bytes_left <= 0) { break; }
 			seg_response_body.clear();
 			try
 			{
-				seg_bytes_read = seg_sock.read_data(seg_response_body, num_of_seg_bytes);
-				//cout << "seg bytes read: " << seg_bytes_read << endl;
-				//cout << "num_of_seg_bytes: " << num_of_seg_bytes << endl;
-                //cout << seg_bytes_left << endl;
+		  		seg_bytes_read = seg_sock.read_data(seg_response_body, num_of_seg_bytes);
  
-				// This is a quick test. What if we just send to the player here? Maybe we don't need to get
-				// all of the data into a buffer here.
-				player->Stream(seg_response_body.c_str(), seg_bytes_read);
+      				// This is a quick test. What if we just send to the player here? Maybe we don't need to get
+      				// all of the data into a buffer here.
+      				player->Stream(seg_response_body.c_str(), seg_bytes_read);
 			}
 			catch (string msg)
 			{
 				cout << msg << endl;
 				delete seg_response;
 				delete seg_uri_obj;
-				//fclose(out);
 				seg_sock.Close();
 				exit(1);
 			}
-		}
-		
-		
-		seg_bytes_left -= num_of_seg_bytes; //seg_response_body.length();
-                //cout << "seg_bytes_left: " << seg_bytes_left << endl;
-                //if(seg_bytes_left == 0) { break; }
-				if(seg_bytes_left <= 0) { break; }
-		// Append the response from the socket to the data_string before clearing the
-		// response_body.
-		//seg_data_string.append(seg_response_body.c_str(), num_of_seg_bytes); //seg_response_body.length());
-		//seg_stream >> seg_response_body;
-
-		seg_response_body.clear();
-		try
-		{
-            //      cout << "stuck here" << endl;
-		  //seg_bytes_read = seg_sock.read_data(seg_response_body, 40960);//seg_bytes_left);
-		  seg_bytes_read = seg_sock.read_data(seg_response_body, num_of_seg_bytes);
-		  //cout << "seg bytes read: " << seg_bytes_read << endl;
-		  //cout << "num_of_seg_bytes: " << num_of_seg_bytes << endl;
-          //        cout << seg_bytes_left << endl;
- 
-      // This is a quick test. What if we just send to the player here? Maybe we don't need to get
-      // all of the data into a buffer here.
-      player->Stream(seg_response_body.c_str(), seg_bytes_read);
-		}
-		catch (string msg)
-		{
-			cout << msg << endl;
-			delete seg_response;
-			delete seg_uri_obj;
-			//fclose(out);
-			seg_sock.Close();
-			exit(1);
-		}
 		} while (seg_bytes_left > 0);
 
 		/*** END OF GETTING THE REST OF THE MESSAGE BODY AND STORING IT ***/
 
-
-		// Test
-		// stop after one segment
-		//break;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // Now get the URI for the individual segment. There is a method within
-    // the playlist class called get_segment_uri which will return the uri
-    // for the individual segment.
-    //string segment_uri = playlist->Get_segment_uri(i);
-
-    // For testing purposes
-    //cout << "the segment uri for " << i << " is: " << segment_uri << endl;
-
-    //int segment_length = playlist->Get_segment_duration(i);
-    //int segment_length = segment_bytes[i];
-
-    // For testing
-    //cout << "the segment length for " << i << " is: " << segment_length << endl;
-
-    // Now we need to print to the screen that we are obtaining the next segment
-    //cout << "Fetching segment " << i << endl;
   }
 
   // Won't know how long until it ends because it is in separate thread.
