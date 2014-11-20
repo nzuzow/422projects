@@ -297,16 +297,15 @@ int main(int argc, char* argv[])
 	}
   } while (bytes_left > 0);
 
-  //cout << "The data string is: " << data_string << endl;
-  //cout << "The size of the data string is: " << data_string.length() << endl << endl;
-
   //cout << "End of getting rest of body and storing it" << endl;
 
   /*** END OF GETTING THE REST OF THE MESSAGE BODY AND STORING IT ***/
 
   // Now try to parse the playlist
   playlist = Playlist::Parse(data_string.c_str(), data_string.length());
-  cout << data_string << endl;
+  
+  //TEST print the output string from the playlist
+  //cout << data_string << endl;
 
   if( playlist == NULL)
   {
@@ -451,7 +450,8 @@ int main(int argc, char* argv[])
 		  s >> seg_content_len;
 		  //s >> response->content_len;
 		}
-
+		
+		
 		// Do a check to see if content length is greater than 0, which will
 		// signify if it has been changed or not.
 		if( seg_content_len <= 0)
@@ -467,34 +467,22 @@ int main(int argc, char* argv[])
     {
       // I think we can actually just send this right to the video player
       player->Stream(seg_response_body.c_str(), seg_response_body.length());
-      cout << seg_response_body.size() << "!!!!" << endl;
+      //cout << seg_response_body.size() << "!!!!" << endl;
+	  
+	  //TEST
+	  seg_content_len -= seg_response_body.length();
 
       //seg_response_header.append(seg_response_body.c_str(), seg_response_body.length());
     }
 
 		/*** END OF RECEIVE RESPONSE HEADER FROM SERVER ***/
 
-		//cout << "end of receive response header from server, get rest of body and store it" << endl;
 
 		/*** GET REST OF THE MESSAGE BODY AND STORE IT ***/
 
-		/* I'm not actually sure if we need to open a new file here or not. I will
-		look at this more tomorrow. */
-
-		// Open a local copy in which to store the file.
-		//out = Open_local_copy(server_uri);
-		// check
-		/*if(!out)
-		{
-		  cout << "Error opening local copy for writing." << endl;
-		  // clean up if failed
-		  delete server_uri;
-		  exit(1);
-		}*/
-
 		// Define some variables to use in downloading the content
 		int seg_bytes_written = 0;
-		unsigned seg_bytes_left;
+		int seg_bytes_left;
 		int seg_total_data;
 		int seg_bytes_read;
 
@@ -513,13 +501,45 @@ int main(int argc, char* argv[])
 		cout << "Fetching segment " << i << endl;
 		
 		do {
+		//Test
+		//cout << "seg_bytes_left initially is: " << seg_bytes_left << endl;
+
 		//fwrite(response_body.c_str(), 1, response_body.length(), out);
 		int num_of_seg_bytes = seg_response_body.size();
 	 	seg_bytes_written += num_of_seg_bytes; //seg_response_body.length();
+		
+		//TEST
+		if( num_of_seg_bytes > seg_bytes_left)
+		{
+			num_of_seg_bytes = seg_bytes_left;
+			seg_response_body.clear();
+			try
+			{
+				seg_bytes_read = seg_sock.read_data(seg_response_body, num_of_seg_bytes);
+				//cout << "seg bytes read: " << seg_bytes_read << endl;
+				//cout << "num_of_seg_bytes: " << num_of_seg_bytes << endl;
+                //cout << seg_bytes_left << endl;
+ 
+				// This is a quick test. What if we just send to the player here? Maybe we don't need to get
+				// all of the data into a buffer here.
+				player->Stream(seg_response_body.c_str(), seg_bytes_read);
+			}
+			catch (string msg)
+			{
+				cout << msg << endl;
+				delete seg_response;
+				delete seg_uri_obj;
+				//fclose(out);
+				seg_sock.Close();
+				exit(1);
+			}
+		}
+		
+		
 		seg_bytes_left -= num_of_seg_bytes; //seg_response_body.length();
-                cout << "seg_bytes_left: " << seg_bytes_left << endl;
-                if(seg_bytes_left == 0) { break; }
-
+                //cout << "seg_bytes_left: " << seg_bytes_left << endl;
+                //if(seg_bytes_left == 0) { break; }
+				if(seg_bytes_left <= 0) { break; }
 		// Append the response from the socket to the data_string before clearing the
 		// response_body.
 		//seg_data_string.append(seg_response_body.c_str(), num_of_seg_bytes); //seg_response_body.length());
@@ -528,11 +548,12 @@ int main(int argc, char* argv[])
 		seg_response_body.clear();
 		try
 		{
-                  cout << "stuck here" << endl;
-		  seg_bytes_read = seg_sock.read_data(seg_response_body, 40960);//seg_bytes_left);
-		  cout << "seg bytes read: " << seg_bytes_read << endl;
-		  cout << "num_of_seg_bytes: " << num_of_seg_bytes << endl;
-                  cout << seg_bytes_left << endl;
+            //      cout << "stuck here" << endl;
+		  //seg_bytes_read = seg_sock.read_data(seg_response_body, 40960);//seg_bytes_left);
+		  seg_bytes_read = seg_sock.read_data(seg_response_body, num_of_seg_bytes);
+		  //cout << "seg bytes read: " << seg_bytes_read << endl;
+		  //cout << "num_of_seg_bytes: " << num_of_seg_bytes << endl;
+          //        cout << seg_bytes_left << endl;
  
       // This is a quick test. What if we just send to the player here? Maybe we don't need to get
       // all of the data into a buffer here.
@@ -552,7 +573,9 @@ int main(int argc, char* argv[])
 		/*** END OF GETTING THE REST OF THE MESSAGE BODY AND STORING IT ***/
 
 
-
+		// Test
+		// stop after one segment
+		//break;
 
 
 
@@ -587,6 +610,7 @@ int main(int argc, char* argv[])
 
   // Won't know how long until it ends because it is in separate thread.
   // Therefore we wait until window is closed by user to guarantee video is not running.
+  cout << "Waiting for playback to finish" << endl;
   player->Wait_for_close();
   // Clean up.
   delete player;
