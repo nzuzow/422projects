@@ -1,5 +1,110 @@
-1. Partner
+1. Partner: Nick Zuzow
 
 2. How to compile. Which machines are tested.
+	make will compile
+	This code was tested on Marge and works.
 
-2. logs
+3. Logs:
+<174 marge:~/CSE422/422projects/Project3 >stream_client http://www.cse.msu.edu/~cse422b/fs14/lab3/San_Diego_Clip/San_Diego_Clip.m3u8
+The playlist contains 99 segments.
+Fetching segment 1
+Fetching segment 2
+Fetching segment 3
+Fetching segment 4
+Fetching segment 5
+Fetching segment 6
+Fetching segment 7
+Fetching segment 8
+Fetching segment 9
+Fetching segment 10
+Fetching segment 11
+Fetching segment 12
+Fetching segment 13
+Fetching segment 14
+Fetching segment 15
+Fetching segment 16
+Fetching segment 17
+Fetching segment 18
+Fetching segment 19
+Fetching segment 20
+Fetching segment 21
+Fetching segment 22
+Fetching segment 23
+Fetching segment 24
+Fetching segment 25
+Fetching segment 26
+Fetching segment 27
+Fetching segment 28
+Fetching segment 29
+Fetching segment 30
+Fetching segment 31
+Fetching segment 32
+Fetching segment 33
+Fetching segment 34
+Fetching segment 35
+Fetching segment 36
+Fetching segment 37
+Fetching segment 38
+Fetching segment 39
+Fetching segment 40
+Fetching segment 41
+Fetching segment 42
+Fetching segment 43
+Fetching segment 44
+Fetching segment 45
+Fetching segment 46
+Fetching segment 47
+Fetching segment 48
+Fetching segment 49
+Fetching segment 50
+Fetching segment 51
+Fetching segment 52
+Fetching segment 53
+Fetching segment 54
+Fetching segment 55
+Fetching segment 56
+Fetching segment 57
+Fetching segment 58
+Fetching segment 59
+Fetching segment 60
+Fetching segment 61
+Fetching segment 62
+Fetching segment 63
+Fetching segment 64
+Fetching segment 65
+Fetching segment 66
+Fetching segment 67
+Fetching segment 68
+Fetching segment 69
+Fetching segment 70
+Fetching segment 71
+Fetching segment 72
+Fetching segment 73
+Fetching segment 74
+Fetching segment 75
+Fetching segment 76
+Fetching segment 77
+Fetching segment 78
+Fetching segment 79
+Fetching segment 80
+Fetching segment 81
+Fetching segment 82
+Fetching segment 83
+Fetching segment 84
+Fetching segment 85
+Fetching segment 86
+Fetching segment 87
+Fetching segment 88
+Fetching segment 89
+Fetching segment 90
+Fetching segment 91
+Fetching segment 92
+Fetching segment 93
+Fetching segment 94
+Fetching segment 95
+Fetching segment 96
+Fetching segment 97
+Fetching segment 98
+Fetching segment 99
+Waiting for playback to finish
+
