@@ -1,7 +1,7 @@
 using namespace std;
 
 #include <unistd.h>     /* Symbolic Constants */
-#include <sys/types.h>  /* Primitive System Data Types */ 
+#include <sys/types.h>  /* Primitive System Data Types */
 #include <errno.h>      /* Errors */
 #include <stdio.h>      /* Input/Output */
 #include <stdlib.h>     /* General Utilities */
@@ -20,15 +20,15 @@ int pet3, pet2;
 void *peterson(void * ptr)
 {
   int *temp = (int *) ptr;
-  int i; 
+  int i;
   int j;
-  if (i == 0 || i == 1) {
-	i = 4;
-  	j = 5;
+  if (*temp == 0 || *temp == 1) {
+    i = 4;
+    j = 5;
   }
-  else if (i == 2 || i == 3) {
-	i = 5;
-	j = 4;
+  else if (*temp == 2 || *temp == 3) {
+    i = 5;
+    j = 4;
   }
   else cout << "error" << endl;
 
@@ -37,7 +37,7 @@ void *peterson(void * ptr)
 	cout << "in final battle while loop" << endl;
       // Non-critical section
       // We do not really care what happens here. But we care that it may take different times. Hence, will invoke a random number generator for doing wait
-      
+
       randomdelay;
 	cout << "setting flag i to 1" << endl;
       flag[i] = 1;
@@ -49,13 +49,13 @@ void *peterson(void * ptr)
       while(flag[j]==1 && turn==j);
       // Entering CS
       cout << "in critical section" << endl;
-      if (i == 4) i = pet3;
-      if (i == 5) i = pet2;
-      cs(i);
-      flag[0] = 0;
-      flag[1] = 0;
-      flag[2] = 0;
-      flag[3] = 0;
+      //if (i == 4) {i = pet3;}
+      //if (i == 5) {i = pet2;}
+      cs(*temp);
+      //flag[0] = 0;
+      //flag[1] = 0;
+      //flag[2] = 0;
+      //flag[3] = 0;
       flag[4] = 0;
       flag[5] = 0;
       break;
@@ -69,9 +69,13 @@ void *peterson2(void * ptr2)
   int k = *temp2;
   int l;
   if (k == 2)
+  {
   	int l = 3;
+  }
   if (k == 3)
-	int l = 2;
+	{
+    int l = 2;
+  }
 
   while(1)
     {
@@ -100,10 +104,13 @@ void *peterson3(void * ptr3)
   cout << "m: " << m << endl;
   int n;
   if (m == 0)
+  {
   	int n = 1;
-  if (m == 1)
- 	int n = 0;
-
+  }
+  else if (m == 1)
+  {
+ 	  int n = 0;
+  }
   while(1)
     {
       // Non-critical section
@@ -136,7 +143,7 @@ int main()
   turn = 0; // Not needed since turn is never used without being set first
   turn2 = 0;
   turn3 = 0;
-     
+
   pthread_t thread1, thread2, thread3, thread4;  /* thread variables */
   int p0 = 0;
   int p1 = 1;
@@ -153,7 +160,7 @@ int main()
   pthread_join(thread2, NULL);
   pthread_join(thread3, NULL);
   pthread_join(thread4, NULL);
-              
-  /* exit */  
+
+  /* exit */
   exit(0);
-} 
+}
