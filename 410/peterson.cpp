@@ -34,21 +34,21 @@ void *peterson(void * ptr)
 
   while(1)
     {
-	cout << "in final battle while loop" << endl;
+	//cout << "in final battle while loop" << endl;
       // Non-critical section
       // We do not really care what happens here. But we care that it may take different times. Hence, will invoke a random number generator for doing wait
 
       randomdelay;
-	cout << "setting flag " << i << " to 1" << endl;
+	//cout << "setting flag " << i << " to 1" << endl;
       flag[i] = 1;
-	cout << "set flag i to 1" << endl;
+	//cout << "set flag i to 1" << endl;
       // There is a possibility that the thread may get swapped out here. So, add a random delay
       randomdelay;
       turn = j;
       randomdelay;
       while(flag[j]==1 && turn==j);
       // Entering CS
-      cout << "in critical section" << endl;
+      //cout << "in critical section" << endl;
       //if (i == 4) {i = pet3;}
       //if (i == 5) {i = pet2;}
       cs(*temp);
@@ -56,9 +56,10 @@ void *peterson(void * ptr)
       //flag[1] = 0;
       //flag[2] = 0;
       //flag[3] = 0;
-      flag[4] = 0;
-      flag[5] = 0;
-      break;
+      //flag[4] = 0;
+      //flag[5] = 0;
+      flag[i] = 0;
+	  break;
       sleep(10);
     }
 }
@@ -67,7 +68,7 @@ void *peterson2(void * ptr2)
 {
   int *temp2 = (int *) ptr2;
   int k = *temp2;
-  cout << "Process " << k << " created" << endl;
+  cout << "k: " << k << endl;
   int l;
   if (k == 2)
   {
