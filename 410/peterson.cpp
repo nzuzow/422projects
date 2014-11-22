@@ -39,7 +39,7 @@ void *peterson(void * ptr)
       // We do not really care what happens here. But we care that it may take different times. Hence, will invoke a random number generator for doing wait
 
       randomdelay;
-	cout << "setting flag i to 1" << endl;
+	cout << "setting flag " << i << " to 1" << endl;
       flag[i] = 1;
 	cout << "set flag i to 1" << endl;
       // There is a possibility that the thread may get swapped out here. So, add a random delay
@@ -67,14 +67,15 @@ void *peterson2(void * ptr2)
 {
   int *temp2 = (int *) ptr2;
   int k = *temp2;
+  cout << "Process " << k << " created" << endl;
   int l;
   if (k == 2)
   {
-  	int l = 3;
+	l = 3;
   }
-  if (k == 3)
-	{
-    int l = 2;
+  else if (k == 3)
+  {
+    l = 2;
   }
 
   while(1)
@@ -91,7 +92,7 @@ void *peterson2(void * ptr2)
       randomdelay;
       while(flag[l]==1 && turn2==l);
       pet2 = k;
-      peterson(ptr2);
+      peterson(temp2);
       flag[k] = 0;
       // Entering CS
     }
@@ -105,11 +106,11 @@ void *peterson3(void * ptr3)
   int n;
   if (m == 0)
   {
-  	int n = 1;
+  	n = 1;
   }
   else if (m == 1)
   {
- 	  int n = 0;
+	n = 0;
   }
   while(1)
     {
@@ -125,7 +126,7 @@ void *peterson3(void * ptr3)
       randomdelay;
       while(flag[n]==1 && turn3==n);
       pet3 = m;
-      peterson(ptr3);
+      peterson(temp3);
       flag[m] = 0;
       // Entering CS
     }

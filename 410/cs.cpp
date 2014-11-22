@@ -6,6 +6,7 @@
 
 void cs(int threadID) {
 	std::cout << "Entering critical section " << threadID << std::endl;
-	randomdelay;
+	//randomdelay;
+	sleep(rand()%15);
 	std::cout << "Exiting critical section " << threadID << std::endl;
 }
